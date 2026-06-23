@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>M-ACTIVE GO — Prototyp</title>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+
+<!-- ================================================
+     VIEW TOGGLE BAR (top fixed bar)
+     ================================================ -->
+<div id="view-toggle">
+  <span class="toggle-logo">M-ACTIVE GO</span>
+  <span class="toggle-label">Widok:</span>
+  <button class="toggle-btn active" id="btn-admin" onclick="switchView('admin')">
+    🔒 Panel admin
+  </button>
+  <button class="toggle-btn" id="btn-public" onclick="switchView('public')">
+    🌐 Widok publiczny
+  </button>
+  <div style="flex:1"></div>
+  <span class="badge badge-proto">PROTOTYP</span>
+</div>
+
+<!-- ================================================
+     TOAST CONTAINER
+     ================================================ -->
+<div id="toast"></div>
+
+<!-- ================================================
+     MODALS
+     ================================================ -->
+
+<!-- Modal: Tournament Saved -->
+<div id="modal-saved" class="modal-overlay hidden">
+  <div class="modal-box">
+    <div style="font-size:36px;margin-bottom:12px">🎉</div>
+    <h2>Turniej został dodany</h2>
+    <p>Turniej jest już widoczny na liście turniejów oraz w widoku publicznym. Możesz go teraz edytować lub od razu dodać kolejny.</p>
+    <div class="modal-actions">
+      <button class="btn btn-primary" onclick="goToTournamentList()">Zobacz listę turniejów</button>
+      <button class="btn btn-secondary" onclick="closeModal('modal-saved'); resetTournamentForm()">Dodaj kolejny</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: PDF Preview trigger -->
+<div id="modal-pdf-trigger" class="modal-overlay hidden">
+  <div class="modal-box">
+    <div style="font-size:36px;margin-bottom:12px">📄</div>
+    <h2>PDF gotowy do wygenerowania</h2>
+    <p>Dokument będzie zawierał komplet informacji o turnieju: opis, daty, lokalizację, listę kategorii oraz drabinki. Każda drabinka zostanie umieszczona na osobnej stronie.</p>
+    <div class="modal-actions">
+      <button class="btn btn-primary" onclick="openPdfPreview()">Podgląd PDF</button>
+      <button class="btn btn-secondary" onclick="closeModal('modal-pdf-trigger')">Zamknij</button>
+    </div>
+  </div>
+</div>
+
+<!-- PDF Preview Full Screen -->
+<div id="pdf-preview" class="pdf-modal-overlay hidden">
+  <div class="pdf-topbar">
+    <span class="pdf-topbar-title">📄 M-ACTIVE Summer Cup 2026 — Podgląd PDF</span>
+    <button class="btn btn-primary btn-sm" onclick="window.print()">🖨️ Drukuj / Zapisz jako PDF</button>
+    <button class="btn btn-secondary btn-sm" onclick="closePdfPreview()">✕ Zamknij</button>
+  </div>
+
+  <div class="pdf-pages">
+    <!-- PDF Page 1: Tournament Info -->
+    <div class="pdf-page">
+      <div class="pdf-header">
+        <div class="pdf-logo-mark">🎾</div>
+        <div>
+          <div class="pdf-brand">M-ACTIVE <span>GO</span></div>
+          <div class="pdf-brand-sub">System zarządzania turniejami tenisowymi</div>
+        </div>
+      </div>
+      <h1>M-ACTIVE Summer Cup 2026</h1>
+      <div class="pdf-subtitle">Weekendowy turniej tenisowy dla zawodników amatorskich</div>
+
+      <div class="pdf-info-grid">
+        <div class="pdf-info-box">
+          <div class="pdf-info-label">Data turnieju</div>
+          <div class="pdf-info-value">4 – 5 lipca 2026</div>
+        </div>
+        <div class="pdf-info-box">
+          <div class="pdf-info-label">Lokalizacja</div>
+          <div class="pdf-info-value">Kortex Tenis Club, Warszawa</div>
+        </div>
+        <div class="pdf-info-box">
+          <div class="pdf-info-label">Organizator</div>
+          <div class="pdf-info-value">M-ACTIVE Sp. z o.o.</div>
+        </div>
+        <div class="pdf-info-box">
+          <div class="pdf-info-label">Kontakt</div>
+          <div class="pdf-info-value">biuro@m-active.pl</div>
+        </div>
+      </div>
+
+      <h2>Opis turnieju</h2>
+      <p style="font-size:13.5px;line-height:1.8;color:#374151;margin-bottom:28px">
+        Weekendowy turniej tenisowy organizowany przez M-ACTIVE dla zawodników amatorskich wszystkich poziomów zaawansowania. Celem turnieju jest popularyzacja tenisa wśród aktywnych dorosłych oraz stworzenie przyjaznej atmosfery rywalizacji i integracji społeczności tenisowej. System prezentuje informacje organizacyjne, kategorie oraz aktualne drabinki turniejowe.
+      </p>
+
+      <h2>Kategorie turniejowe</h2>
+      <div class="pdf-category-list">
+        <div class="pdf-category-item"><div class="pdf-cat-dot"></div>Debel kobiety open</div>
+        <div class="pdf-category-item"><div class="pdf-cat-dot"></div>Debel mężczyźni open</div>
+        <div class="pdf-category-item"><div class="pdf-cat-dot"></div>Singiel mężczyźni open</div>
+        <div class="pdf-category-item"><div class="pdf-cat-dot"></div>Singiel kobiety open</div>
+        <div class="pdf-category-item"><div class="pdf-cat-dot"></div>Mikst open</div>
+        <div class="pdf-category-item"><div class="pdf-cat-dot"></div>Turniej pocieszenia</div>
+      </div>
+      <div class="pdf-page-number">Strona 1 / 3</div>
+    </div>
+
+    <!-- PDF Page 2: Women's Doubles Bracket -->
+    <div class="pdf-page">
+      <div class="pdf-header">
+        <div class="pdf-logo-mark">🎾</div>
+        <div>
+          <div class="pdf-brand">M-ACTIVE <span>GO</span></div>
+          <div class="pdf-brand-sub">M-ACTIVE Summer Cup 2026</div>
+        </div>
+      </div>
+      <h1>Debel kobiety open</h1>
+      <div class="pdf-subtitle">Format: Drabinka single-elimination · 8 par · 4–5 lipca 2026</div>
+      <div class="pdf-bracket" id="pdf-bracket-women"></div>
+      <div class="pdf-page-number">Strona 2 / 3</div>
+    </div>
+
+    <!-- PDF Page 3: Men's Singles Bracket -->
+    <div class="pdf-page">
+      <div class="pdf-header">
+        <div class="pdf-logo-mark">🎾</div>
+        <div>
+          <div class="pdf-brand">M-ACTIVE <span>GO</span></div>
+          <div class="pdf-brand-sub">M-ACTIVE Summer Cup 2026</div>
+        </div>
+      </div>
+      <h1>Singiel mężczyźni open</h1>
+      <div class="pdf-subtitle">Format: Drabinka single-elimination · 8 zawodników · 4–5 lipca 2026</div>
+      <div class="pdf-bracket" id="pdf-bracket-men"></div>
+      <div class="pdf-page-number">Strona 3 / 3</div>
+    </div>
+  </div>
+</div>
+
+<!-- ================================================
+     ADMIN SECTION
+     ================================================ -->
+<div id="admin-view" class="view">
+
+  <!-- Admin Login Screen -->
+  <div id="admin-login">
+    <div class="login-card">
+      <div class="login-logo">
+        <div class="login-logo-mark">🎾</div>
+        <div class="login-logo-text">M-ACTIVE <span>GO</span></div>
+      </div>
+      <h1>Panel organizatora</h1>
+      <p class="login-sub">Zaloguj się, aby zarządzać turniejami</p>
+      <div class="form-group">
+        <label class="form-label">E-mail</label>
+        <input class="form-input" type="email" placeholder="admin@m-active.pl" id="login-email"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Hasło</label>
+        <input class="form-input" type="password" placeholder="••••••••" id="login-password"/>
+      </div>
+      <button id="login-submit" class="btn btn-primary" style="width:100%;justify-content:center;padding:11px" onclick="adminLogin()">
+        Zaloguj się
+      </button>
+      <p class="login-hint">Dostęp tylko dla organizatorów turnieju<br>
+        <span style="color:#4B5563">Demo: dowolny email + hasło</span>
+      </p>
+    </div>
+  </div>
+
+  <!-- Admin App Shell (Dashboard) -->
+  <div id="admin-app" class="hidden">
+    <!-- Sidebar -->
+    <aside id="admin-sidebar">
+      <div class="sidebar-brand">
+        <div class="sidebar-brand-name">M-ACTIVE <span>GO</span></div>
+        <div class="sidebar-brand-sub">Panel organizatora</div>
+      </div>
+      <nav class="sidebar-nav">
+        <div class="sidebar-section-label">Nawigacja</div>
+        <button class="sidebar-item active" id="nav-dashboard" onclick="showSection('dashboard')">
+          <span class="si-icon">📊</span> Dashboard
+        </button>
+        <button class="sidebar-item" id="nav-organizer" onclick="showSection('organizer')">
+          <span class="si-icon">🏢</span> Dane M-ACTIVE
+        </button>
+        <button class="sidebar-item" id="nav-tournaments" onclick="showSection('tournaments')">
+          <span class="si-icon">🏆</span> Turnieje
+        </button>
+        <button class="sidebar-item" id="nav-add-tournament" onclick="showSection('add-tournament')">
+          <span class="si-icon">➕</span> Dodaj turniej
+        </button>
+        <div class="sidebar-section-label">System</div>
+        <button class="sidebar-item" onclick="showToast('Ustawienia — wkrótce dostępne')">
+          <span class="si-icon">⚙️</span> Ustawienia
+        </button>
+      </nav>
+      <div class="sidebar-footer">
+        <button class="sidebar-item" onclick="adminLogout()">
+          <span class="si-icon">🚪</span> Wyloguj
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main id="admin-main">
+
+      <!-- Top Bar -->
+      <div class="admin-topbar">
+        <h1 id="topbar-title">Dashboard</h1>
+        <span class="badge badge-proto">Prototyp</span>
+        <button class="btn btn-primary btn-sm" onclick="showSection('add-tournament')">
+          ➕ Dodaj turniej
+        </button>
+      </div>
+
+      <!-- ====== SECTION: Dashboard ====== -->
+      <div id="sec-dashboard" class="admin-section-content">
+        <div class="stats-grid" id="stats-grid"></div>
+
+        <div class="section-header">
+          <div>
+            <div class="section-title">Ostatnie turnieje</div>
+            <div class="section-sub">Twoje aktywne i nadchodzące turnieje</div>
+          </div>
+          <button class="btn btn-secondary btn-sm" onclick="showSection('tournaments')">Zobacz wszystkie</button>
+        </div>
+        <div id="dashboard-tournament-list"></div>
+      </div>
+
+      <!-- ====== SECTION: Organizer Data ====== -->
+      <div id="sec-organizer" class="admin-section-content hidden">
+        <div class="section-header">
+          <div>
+            <div class="section-title">Dane organizatora</div>
+            <div class="section-sub">Informacje publiczne o M-ACTIVE</div>
+          </div>
+        </div>
+
+        <div class="form-panel">
+          <div class="form-panel-title">Dane podstawowe</div>
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label">Nazwa skrócona</label>
+              <input class="form-input" value="M-ACTIVE" id="org-name"/>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Pełna nazwa firmy</label>
+              <input class="form-input" value="M-ACTIVE Sp. z o.o." id="org-full"/>
+            </div>
+            <div class="form-group full">
+              <label class="form-label">Adres</label>
+              <input class="form-input" value="ul. Tenisowa 12, 00-001 Warszawa" id="org-address"/>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Telefon</label>
+              <input class="form-input" value="+48 600 123 456" id="org-phone"/>
+            </div>
+            <div class="form-group">
+              <label class="form-label">E-mail</label>
+              <input class="form-input" value="biuro@m-active.pl" id="org-email"/>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Strona www</label>
+              <input class="form-input" value="www.m-active.pl" id="org-web"/>
+            </div>
+            <div class="form-group full">
+              <label class="form-label">Krótki opis organizatora</label>
+              <textarea class="form-input" id="org-desc">M-ACTIVE to firma specjalizująca się w organizacji turniejów tenisowych dla amatorów i zaawansowanych graczy. Działamy na terenie całej Polski, stawiając na profesjonalizm, dostępność i pasję do sportu.</textarea>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-panel">
+          <div class="form-panel-title">Logo organizatora</div>
+          <div class="logo-upload-area" onclick="showToast('Upload logo — funkcja dostępna w wersji produkcyjnej')">
+            <div class="logo-upload-icon">🖼️</div>
+            <div class="logo-upload-text">Kliknij, aby wgrać logo</div>
+            <div class="logo-upload-hint">PNG, JPG, SVG — maks. 2 MB</div>
+          </div>
+        </div>
+
+        <button class="btn btn-primary" onclick="saveOrgData()">💾 Zapisz dane</button>
+      </div>
+
+      <!-- ====== SECTION: Add Tournament ====== -->
+      <div id="sec-add-tournament" class="admin-section-content hidden">
+        <div class="section-header">
+          <div>
+            <div class="section-title">Nowy turniej</div>
+            <div class="section-sub">Wypełnij formularz, aby dodać turniej</div>
+          </div>
+        </div>
+
+        <div class="form-panel">
+          <div class="form-panel-title">Informacje ogólne</div>
+          <div class="form-grid">
+            <div class="form-group full">
+              <label class="form-label">Nazwa turnieju</label>
+              <input class="form-input" placeholder="np. M-ACTIVE Open 2026" id="t-name"/>
+            </div>
+            <div class="form-group full">
+              <label class="form-label">Krótki opis</label>
+              <textarea class="form-input" placeholder="Krótki opis turnieju widoczny na liście..." id="t-desc" style="min-height:80px"></textarea>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Data startu</label>
+              <input class="form-input" type="date" id="t-start"/>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Data końca</label>
+              <input class="form-input" type="date" id="t-end"/>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Lokalizacja</label>
+              <input class="form-input" placeholder="np. Kortex Tenis Club, Warszawa" id="t-location"/>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Organizator</label>
+              <input class="form-input" value="M-ACTIVE" id="t-organizer"/>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-panel">
+          <div class="form-panel-title">Kategorie turniejowe</div>
+          <div id="category-tags" class="categories-list"></div>
+          <div class="add-category-row">
+            <input class="form-input" placeholder="Nazwa kategorii, np. Singiel mężczyźni open" id="new-category-input"
+              style="flex:1" onkeydown="if(event.key==='Enter'){addCategory()}"/>
+            <button class="btn btn-secondary" onclick="addCategory()">+ Dodaj kategorię</button>
+          </div>
+          <div style="margin-top:12px">
+            <button class="btn btn-ghost btn-sm" onclick="addDefaultCategories()" style="font-size:12px">
+              ✨ Dodaj domyślne kategorie
+            </button>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:10px;align-items:center">
+          <button class="btn btn-primary" onclick="saveTournament()">💾 Zapisz turniej</button>
+          <button class="btn btn-ghost" onclick="resetTournamentForm()">Wyczyść formularz</button>
+        </div>
+      </div>
+
+      <!-- ====== SECTION: Tournament List ====== -->
+      <div id="sec-tournaments" class="admin-section-content hidden">
+        <div class="section-header">
+          <div>
+            <div class="section-title">Lista turniejów</div>
+            <div class="section-sub">Zarządzaj swoimi turniejami</div>
+          </div>
+          <button class="btn btn-primary btn-sm" onclick="showSection('add-tournament')">➕ Dodaj turniej</button>
+        </div>
+        <div class="tournament-table-wrap">
+          <table class="t-table" id="admin-tournament-table">
+            <thead>
+              <tr>
+                <th>Turniej</th>
+                <th>Data</th>
+                <th>Lokalizacja</th>
+                <th>Kategorie</th>
+                <th>Status</th>
+                <th>Akcje</th>
+              </tr>
+            </thead>
+            <tbody id="admin-tournament-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+    </main>
+  </div><!-- /admin-app -->
+</div><!-- /admin-view -->
+
+
+<!-- ================================================
+     PUBLIC VIEW
+     ================================================ -->
+<div id="public-view" class="view hidden">
+
+  <!-- Public Nav -->
+  <nav id="public-nav">
+    <div class="pub-nav-inner">
+      <div class="pub-nav-logo" onclick="goPublicHome()">M-ACTIVE <span>GO</span></div>
+      <div class="pub-nav-links">
+        <button class="pub-nav-link active" onclick="goPublicHome()">Turnieje</button>
+        <button class="pub-nav-link" onclick="showToast('O nas — sekcja wkrótce')">O nas</button>
+        <button class="pub-nav-link" onclick="showToast('Kontakt — sekcja wkrótce')">Kontakt</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Public Home Page -->
+  <div id="pub-home">
+    <div class="pub-page">
+      <!-- Hero -->
+      <div class="pub-hero">
+        <div class="pub-hero-eyebrow">M-ACTIVE GO</div>
+        <h1>Turnieje tenisowe<br><span>w jednym miejscu</span></h1>
+        <p>Turnieje, kategorie i drabinki — pełna informacja dla zawodników i kibiców</p>
+        <button class="btn btn-primary btn-lg" onclick="document.getElementById('pub-tournament-section').scrollIntoView({behavior:'smooth'})">
+          🎾 Zobacz turnieje
+        </button>
+      </div>
+
+      <!-- Tournament List -->
+      <div id="pub-tournament-section">
+        <div class="section-eyebrow">Aktualne turnieje</div>
+        <div class="section-h2">Turnieje M-ACTIVE</div>
+        <div class="section-desc">Wybierz turniej, aby zobaczyć szczegóły, kategorie i drabinki</div>
+        <div class="tournaments-grid" id="pub-tournaments-grid"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tournament Detail Page -->
+  <div id="pub-detail" class="hidden">
+    <div class="pub-page">
+      <div class="breadcrumb">
+        <span onclick="goPublicHome()">Turnieje</span>
+        <span class="breadcrumb-sep">/</span>
+        <span class="current" id="detail-breadcrumb">Turniej</span>
+      </div>
+
+      <!-- Hero -->
+      <div class="detail-hero">
+        <div class="detail-hero-top">
+          <h1 id="detail-name">Nazwa turnieju</h1>
+          <span id="detail-badge"></span>
+        </div>
+        <div class="detail-hero-meta">
+          <div class="detail-hero-meta-item"><span class="icon">📅</span><span id="detail-dates"></span></div>
+          <div class="detail-hero-meta-item"><span class="icon">📍</span><span id="detail-location"></span></div>
+          <div class="detail-hero-meta-item"><span class="icon">🏢</span><span id="detail-organizer"></span></div>
+        </div>
+      </div>
+
+      <!-- Info + Organizer layout -->
+      <div class="detail-layout">
+        <div class="detail-panel">
+          <h2>Opis turnieju</h2>
+          <p id="detail-description"></p>
+          <div class="divider"></div>
+          <div class="alert alert-info">
+            <span>ℹ️</span>
+            <span>Rejestracja i wyniki aktualizowane są na bieżąco przez organizatora turnieju.</span>
+          </div>
+        </div>
+        <div class="detail-panel">
+          <h2>Informacje organizacyjne</h2>
+          <div class="organizer-info" id="detail-org-info"></div>
+        </div>
+      </div>
+
+      <!-- Categories -->
+      <div class="categories-section">
+        <div class="section-header">
+          <div>
+            <div class="section-title">Kategorie turniejowe</div>
+            <div class="section-sub">Wybierz kategorię, aby zobaczyć drabinkę</div>
+          </div>
+        </div>
+        <div class="categories-grid" id="pub-categories-grid"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bracket View -->
+  <div id="pub-bracket" class="hidden">
+    <div class="bracket-page">
+      <div class="breadcrumb" id="bracket-breadcrumb"></div>
+
+      <div class="bracket-header">
+        <div class="bracket-title" id="bracket-category-title"></div>
+        <div class="bracket-meta" id="bracket-meta"></div>
+
+        <!-- Category switcher -->
+        <div class="category-switcher" id="bracket-category-switcher"></div>
+      </div>
+
+      <div class="bracket-container">
+        <!-- Round labels -->
+        <div class="bracket-round-labels" id="bracket-round-labels"></div>
+        <!-- Bracket scroll area -->
+        <div class="bracket-scroll" id="bracket-scroll"></div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /public-view -->
+
+<script src="script.js"></script>
+</body>
+</html>
