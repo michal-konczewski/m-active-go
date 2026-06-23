@@ -2114,3 +2114,191 @@ body.dark .match-row.is-winner .player-name {
 .bc-link:hover { text-decoration: underline; }
 .bc-current { color: var(--text); font-weight: 600; }
 .breadcrumb-sep { color: var(--border-strong); }
+
+/* =============================================
+   Badge: Drawn (Rozlosowana)
+   ============================================= */
+.badge-drawn {
+  background: rgba(59,130,246,0.12);
+  color: #2563EB;
+  border: 1px solid rgba(59,130,246,0.25);
+}
+.badge-drawn::before { background: #3B82F6; }
+body.dark .badge-drawn { color: #60A5FA; }
+
+/* =============================================
+   Admin — Tournament Detail + Category Cards
+   ============================================= */
+.categories-admin-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+  margin-top: 8px;
+}
+
+.category-card-admin {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  cursor: pointer;
+  transition: border-color 160ms ease, box-shadow 160ms ease;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.category-card-admin:hover {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-light);
+}
+
+.cat-card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.cat-card-name {
+  font-size: 14px;
+  font-weight: 700;
+  flex: 1;
+}
+
+.cat-card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  font-size: 12.5px;
+  color: var(--text-muted);
+}
+
+.cat-card-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+  margin-top: 4px;
+}
+
+.cat-action-bar {
+  /* wrapper for category action buttons */
+}
+
+/* =============================================
+   Participants Table
+   ============================================= */
+.participants-table-wrap {
+  overflow-x: auto;
+  margin-top: 12px;
+}
+
+.participants-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13.5px;
+}
+
+.participants-table th {
+  text-align: left;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface-alt);
+  white-space: nowrap;
+}
+
+.participants-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+
+.participants-table tr:last-child td { border-bottom: none; }
+.participants-table tr:nth-child(even) td { background: var(--surface-alt); }
+
+/* =============================================
+   Seed badge
+   ============================================= */
+.seed-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--accent);
+  color: #fff;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 7px;
+  min-width: 22px;
+}
+
+/* =============================================
+   Draw button
+   ============================================= */
+.draw-btn {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+  font-weight: 700;
+}
+.draw-btn:hover { background: var(--accent-dark); border-color: var(--accent-dark); }
+.draw-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* =============================================
+   PDF Mode selector
+   ============================================= */
+.pdf-mode-options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.pdf-mode-opt {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13.5px;
+  cursor: pointer;
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--surface-alt);
+  transition: border-color 160ms ease;
+}
+
+.pdf-mode-opt:hover { border-color: var(--accent); }
+.pdf-mode-opt input[type="radio"] { accent-color: var(--accent); }
+
+/* =============================================
+   Blank PDF cell
+   ============================================= */
+.blank-cell {
+  border: 1.5px dashed var(--border-strong);
+  border-radius: 3px;
+  color: transparent;
+  background: var(--surface-alt);
+  min-width: 22px;
+  display: inline-block;
+}
+
+/* =============================================
+   Participant add form
+   ============================================= */
+.participant-add-form {
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 16px;
+}

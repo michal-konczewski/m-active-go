@@ -49,12 +49,117 @@
   </div>
 </div>
 
+<!-- Modal: Add Category -->
+<div id="modal-add-category" class="modal-overlay hidden">
+  <div class="modal-box" style="max-width:560px">
+    <h2>Dodaj kategorię</h2>
+    <div class="form-grid" style="margin-bottom:16px">
+      <div class="form-group full">
+        <label class="form-label">Nazwa kategorii</label>
+        <input class="form-input" id="nc-name" placeholder="np. Singiel kobiety open"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Typ</label>
+        <select class="form-input" id="nc-type">
+          <option value="singiel">Singiel</option>
+          <option value="debel">Debel</option>
+          <option value="mikst">Mikst</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Płeć / Grupa</label>
+        <select class="form-input" id="nc-gender">
+          <option value="kobiety">Kobiety</option>
+          <option value="mezczyzni">Mężczyźni</option>
+          <option value="open">Open</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Poziom</label>
+        <select class="form-input" id="nc-level">
+          <option value="open">Open</option>
+          <option value="poczatkujacy">Początkujący</option>
+          <option value="sredniozaawansowany">Średniozaawansowany</option>
+          <option value="zaawansowany">Zaawansowany</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Limit uczestników</label>
+        <select class="form-input" id="nc-limit">
+          <option value="8">8</option>
+          <option value="16">16</option>
+          <option value="32">32</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Format rozgrywek</label>
+        <select class="form-input" id="nc-format">
+          <option value="elimination">Drabinka single-elimination</option>
+          <option value="groups">Grupy + play-off</option>
+          <option value="roundrobin">Każdy z każdym</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Liczba rozstawionych</label>
+        <select class="form-input" id="nc-seeds">
+          <option value="0">0</option>
+          <option value="2" selected>2</option>
+          <option value="4">4</option>
+          <option value="8">8</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Status</label>
+        <select class="form-input" id="nc-status">
+          <option value="planned">Planowana</option>
+          <option value="drawn">Rozlosowana</option>
+          <option value="active">Aktywna</option>
+          <option value="finished">Zakończona</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Data startu kategorii</label>
+        <input class="form-input" type="date" id="nc-date"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Godzina startu</label>
+        <input class="form-input" type="time" id="nc-time"/>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-primary" onclick="saveNewCategory()">Zapisz kategorię</button>
+      <button class="btn btn-secondary" onclick="closeModal('modal-add-category')">Anuluj</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Draw -->
+<div id="modal-draw" class="modal-overlay hidden">
+  <div class="modal-box">
+    <div style="font-size:36px;margin-bottom:12px">🎲</div>
+    <h2>Losowanie drabinki</h2>
+    <div id="modal-draw-info" style="margin-bottom:16px;font-size:14px;color:var(--text-muted);line-height:1.7"></div>
+    <div class="modal-actions">
+      <button class="btn btn-primary draw-btn" onclick="executeDraw()">🎲 Losuj drabinkę</button>
+      <button class="btn btn-secondary" onclick="closeModal('modal-draw')">Anuluj</button>
+    </div>
+  </div>
+</div>
+
 <!-- Modal: PDF Preview trigger -->
 <div id="modal-pdf-trigger" class="modal-overlay hidden">
   <div class="modal-box">
     <div style="font-size:36px;margin-bottom:12px">📄</div>
-    <h2>PDF gotowy do wygenerowania</h2>
-    <p>Dokument będzie zawierał komplet informacji o turnieju: opis, daty, lokalizację, listę kategorii oraz drabinki. Każda drabinka zostanie umieszczona na osobnej stronie.</p>
+    <h2>Generuj PDF</h2>
+    <p>Wybierz typ dokumentu PDF do wygenerowania.</p>
+    <div class="pdf-mode-selector" style="margin-bottom:20px">
+      <label class="form-label">Typ PDF:</label>
+      <div class="pdf-mode-options">
+        <label class="pdf-mode-opt"><input type="radio" name="pdf-mode" value="blank" checked> Drabinki do druku — puste pola na wyniki</label>
+        <label class="pdf-mode-opt"><input type="radio" name="pdf-mode" value="current"> Aktualny stan turnieju — z wpisanymi wynikami</label>
+        <label class="pdf-mode-opt"><input type="radio" name="pdf-mode" value="final"> Finalny PDF — pełne wyniki i zwycięzcy</label>
+      </div>
+    </div>
     <div class="modal-actions">
       <button class="btn btn-primary" onclick="openPdfPreview()">Podgląd PDF</button>
       <button class="btn btn-secondary" onclick="closeModal('modal-pdf-trigger')">Zamknij</button>
@@ -549,6 +654,33 @@
             <tbody id="admin-tournament-tbody"></tbody>
           </table>
         </div>
+      </div>
+
+      <!-- ====== SECTION: Tournament Detail ====== -->
+      <div id="sec-tournament-detail" class="admin-section-content hidden">
+        <div id="tournament-detail-back" style="margin-bottom:16px">
+          <button class="btn btn-ghost btn-sm" onclick="showSection('tournaments')">← Powrót do listy turniejów</button>
+        </div>
+        <div id="tournament-detail-banner" class="detail-hero" style="margin-bottom:24px"></div>
+        <div class="section-header">
+          <div>
+            <div class="section-title">Kategorie turnieju</div>
+            <div class="section-sub">Zarządzaj kategoriami i drabinkami</div>
+          </div>
+          <button class="btn btn-primary btn-sm" onclick="openAddCategoryModal()">➕ Dodaj kategorię</button>
+        </div>
+        <div id="tournament-detail-categories" class="categories-admin-grid"></div>
+      </div>
+
+      <!-- ====== SECTION: Category Detail ====== -->
+      <div id="sec-category-detail" class="admin-section-content hidden">
+        <div id="category-detail-breadcrumb" class="admin-breadcrumb" style="margin-bottom:12px"></div>
+        <div style="margin-bottom:16px">
+          <button class="btn btn-ghost btn-sm" id="category-detail-back-btn">← Wróć do turnieju</button>
+        </div>
+        <div class="cat-action-bar" id="category-action-bar"></div>
+        <div id="category-info-panel" class="form-panel" style="margin-bottom:24px"></div>
+        <div id="category-main-content"></div>
       </div>
 
     </main>

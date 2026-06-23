@@ -100,12 +100,12 @@ const mockTournaments = [
     organizer: "M-ACTIVE",
     status: "active",
     categories: [
-      { id: 1, name: "Debel kobiety open",      players: 8,  type: "Drabinka",        status: "active",   bracket: womenDoublesBracket },
-      { id: 2, name: "Debel mężczyźni open",    players: 8,  type: "Drabinka",        status: "active",   bracket: null },
-      { id: 3, name: "Singiel mężczyźni open",  players: 8,  type: "Drabinka",        status: "active",   bracket: menSinglesBracket },
-      { id: 4, name: "Singiel kobiety open",    players: 6,  type: "Drabinka",        status: "planned",  bracket: null },
-      { id: 5, name: "Mikst open",              players: 8,  type: "Drabinka",        status: "active",   bracket: mixedOpenBracket },
-      { id: 6, name: "Turniej pocieszenia",     players: 4,  type: "Każdy z każdym",  status: "planned",  bracket: null },
+      { id: 1, name: "Debel kobiety open",      players: 8,  type: "Drabinka",        status: "active",   bracket: womenDoublesBracket, categoryType: 'debel',   gender: 'kobiety',    level: 'open', limit: 8,  format: 'elimination', seedsCount: 2, dateStart: null, timeStart: null, participants: [] },
+      { id: 2, name: "Debel mężczyźni open",    players: 8,  type: "Drabinka",        status: "active",   bracket: null,                categoryType: 'debel',   gender: 'mezczyzni',  level: 'open', limit: 8,  format: 'elimination', seedsCount: 2, dateStart: null, timeStart: null, participants: [] },
+      { id: 3, name: "Singiel mężczyźni open",  players: 8,  type: "Drabinka",        status: "active",   bracket: menSinglesBracket,   categoryType: 'singiel', gender: 'mezczyzni',  level: 'open', limit: 8,  format: 'elimination', seedsCount: 2, dateStart: null, timeStart: null, participants: [] },
+      { id: 4, name: "Singiel kobiety open",    players: 6,  type: "Drabinka",        status: "planned",  bracket: null,                categoryType: 'singiel', gender: 'kobiety',    level: 'open', limit: 8,  format: 'elimination', seedsCount: 2, dateStart: null, timeStart: null, participants: [] },
+      { id: 5, name: "Mikst open",              players: 8,  type: "Drabinka",        status: "active",   bracket: mixedOpenBracket,    categoryType: 'mikst',   gender: 'open',       level: 'open', limit: 8,  format: 'elimination', seedsCount: 2, dateStart: null, timeStart: null, participants: [] },
+      { id: 6, name: "Turniej pocieszenia",     players: 4,  type: "Każdy z każdym",  status: "planned",  bracket: null,                categoryType: 'debel',   gender: 'open',       level: 'open', limit: 8,  format: 'roundrobin',  seedsCount: 2, dateStart: null, timeStart: null, participants: [] },
     ]
   },
   {
@@ -118,8 +118,8 @@ const mockTournaments = [
     organizer: "M-ACTIVE",
     status: "planned",
     categories: [
-      { id: 7, name: "Debel kobiety open",      players: 8,  type: "Drabinka",       status: "planned", bracket: null },
-      { id: 8, name: "Debel kobiety advanced",  players: 8,  type: "Drabinka",       status: "planned", bracket: null },
+      { id: 7, name: "Debel kobiety open",      players: 8,  type: "Drabinka",       status: "planned", bracket: null, categoryType: 'debel', gender: 'kobiety', level: 'open', limit: 8,  format: 'elimination', seedsCount: 2, dateStart: null, timeStart: null, participants: [] },
+      { id: 8, name: "Debel kobiety advanced",  players: 8,  type: "Drabinka",       status: "planned", bracket: null, categoryType: 'debel', gender: 'kobiety', level: 'zaawansowany', limit: 8,  format: 'elimination', seedsCount: 2, dateStart: null, timeStart: null, participants: [] },
     ]
   },
   {
@@ -132,10 +132,10 @@ const mockTournaments = [
     organizer: "M-ACTIVE",
     status: "finished",
     categories: [
-      { id: 9,  name: "Singiel mężczyźni open", players: 12, type: "Drabinka",       status: "finished", bracket: null },
-      { id: 10, name: "Singiel kobiety open",   players: 8,  type: "Drabinka",       status: "finished", bracket: null },
-      { id: 11, name: "Debel mieszany open",    players: 8,  type: "Drabinka",       status: "finished", bracket: null },
-      { id: 12, name: "Turniej seniors 40+",    players: 6,  type: "Każdy z każdym", status: "finished", bracket: null },
+      { id: 9,  name: "Singiel mężczyźni open", players: 12, type: "Drabinka",       status: "finished", bracket: null, categoryType: 'singiel', gender: 'mezczyzni', level: 'open', limit: 16, format: 'elimination', seedsCount: 2, dateStart: null, timeStart: null, participants: [] },
+      { id: 10, name: "Singiel kobiety open",   players: 8,  type: "Drabinka",       status: "finished", bracket: null, categoryType: 'singiel', gender: 'kobiety',   level: 'open', limit: 8,  format: 'elimination', seedsCount: 2, dateStart: null, timeStart: null, participants: [] },
+      { id: 11, name: "Debel mieszany open",    players: 8,  type: "Drabinka",       status: "finished", bracket: null, categoryType: 'debel',   gender: 'open',      level: 'open', limit: 8,  format: 'elimination', seedsCount: 2, dateStart: null, timeStart: null, participants: [] },
+      { id: 12, name: "Turniej seniors 40+",    players: 6,  type: "Każdy z każdym", status: "finished", bracket: null, categoryType: 'singiel', gender: 'mezczyzni', level: 'open', limit: 8,  format: 'roundrobin',  seedsCount: 0, dateStart: null, timeStart: null, participants: [] },
     ]
   }
 ];
@@ -151,9 +151,12 @@ const state = {
   publicSection: 'home',
   selectedTournamentId: 1,
   selectedCategoryId: 1,
+  selectedCategoryDetailId: null,
   editingTournamentId: null,
+  pdfTournamentId: null,
   tournaments: [...mockTournaments],
-  categories: []
+  categories: [],
+  _pendingDraw: null
 };
 
 /* =============================================
@@ -227,7 +230,14 @@ function routeCurrentHash() {
     _switchView('admin', true);
     if (!state.adminLoggedIn) return;
     const sub = parts[1];
-    if (sub === 'tournaments') _showSection('tournaments', true);
+    if (sub === 'tournaments' && parts[2] && parts[3] === 'cat' && parts[4]) {
+      showTournamentDetail(parseInt(parts[2]), true);
+      showCategoryDetail(parseInt(parts[2]), parseInt(parts[4]), true);
+    }
+    else if (sub === 'tournaments' && parts[2] && !isNaN(parseInt(parts[2]))) {
+      showTournamentDetail(parseInt(parts[2]), true);
+    }
+    else if (sub === 'tournaments') _showSection('tournaments', true);
     else if (sub === 'add-tournament') _showSection('add-tournament', true);
     else if (sub === 'edit' && parts[2]) { state.editingTournamentId = parseInt(parts[2]); _showSection('edit-tournament', true); }
     else if (sub === 'organizer') _showSection('organizer', true);
@@ -294,12 +304,14 @@ function adminLogout() {
    ============================================= */
 
 const sectionTitles = {
-  dashboard:          'Dashboard',
-  organizer:          'Dane M-ACTIVE',
-  tournaments:        'Turnieje',
-  'add-tournament':   'Dodaj turniej',
-  'edit-tournament':  'Edytuj turniej',
-  settings:           'Ustawienia'
+  dashboard:           'Dashboard',
+  organizer:           'Dane M-ACTIVE',
+  tournaments:         'Turnieje',
+  'add-tournament':    'Dodaj turniej',
+  'edit-tournament':   'Edytuj turniej',
+  settings:            'Ustawienia',
+  'tournament-detail': 'Turniej',
+  'category-detail':   'Kategoria'
 };
 
 function _showSection(name, skipHistory) {
@@ -332,9 +344,19 @@ function showSection(name) {
   }
 }
 
-function renderAdminBreadcrumb(section) {
+function renderAdminBreadcrumb(section, t) {
   const el = document.getElementById('admin-breadcrumb');
   if (!el) return;
+
+  if (section === 'tournament-detail' && t) {
+    el.innerHTML = `
+      <span class="bc-link" onclick="navigate('admin')">Dashboard</span>
+      <span class="breadcrumb-sep">/</span>
+      <span class="bc-link" onclick="showSection('tournaments')">Turnieje</span>
+      <span class="breadcrumb-sep">/</span>
+      <span class="bc-current">${t.name}</span>`;
+    return;
+  }
 
   const crumbs = {
     dashboard:        [['Dashboard', null]],
@@ -343,6 +365,8 @@ function renderAdminBreadcrumb(section) {
     'add-tournament': [['Dashboard', 'admin'], ['Turnieje', 'admin/tournaments'], ['Dodaj turniej', null]],
     'edit-tournament':[['Dashboard', 'admin'], ['Turnieje', 'admin/tournaments'], ['Edytuj turniej', null]],
     settings:         [['Dashboard', 'admin'], ['Ustawienia', null]],
+    'tournament-detail': [['Dashboard', 'admin'], ['Turnieje', 'admin/tournaments'], ['Turniej', null]],
+    'category-detail':   [['Dashboard', 'admin'], ['Turnieje', 'admin/tournaments'], ['Turniej', null], ['Kategoria', null]],
   };
 
   const items = crumbs[section] || [['Dashboard', null]];
@@ -421,6 +445,7 @@ function renderAdminTournamentList() {
       <td>${badgeHtml(t.status)}</td>
       <td>
         <div class="t-actions">
+          <button class="btn btn-primary btn-sm" onclick="showTournamentDetail(${t.id})">📋 Szczegóły</button>
           <button class="btn btn-secondary btn-sm" onclick="editTournament(${t.id})">✏️ Edytuj</button>
           <button class="btn btn-ghost btn-sm" onclick="openPublicPreview(${t.id})">🌐 Podgląd</button>
           <button class="btn btn-ghost btn-sm" onclick="openPdfModal(${t.id})">📄 PDF</button>
@@ -598,6 +623,7 @@ function goToTournamentList() {
    ============================================= */
 
 function openPdfModal(id) {
+  state.pdfTournamentId = id;
   openModal('modal-pdf-trigger');
 }
 
@@ -613,7 +639,9 @@ function openPublicPreview(id) {
 
 function openPdfPreview() {
   closeModal('modal-pdf-trigger');
-  renderPdfBrackets();
+  const mode = document.querySelector('input[name="pdf-mode"]:checked')?.value || 'current';
+  const isBlank = mode === 'blank';
+  renderPdfBrackets(isBlank);
   document.getElementById('pdf-preview').classList.remove('hidden');
   document.body.style.overflow = 'hidden';
 }
@@ -623,9 +651,9 @@ function closePdfPreview() {
   document.body.style.overflow = '';
 }
 
-function renderPdfBrackets() {
-  document.getElementById('pdf-bracket-women').innerHTML = buildBracketHTML(womenDoublesBracket, true);
-  document.getElementById('pdf-bracket-men').innerHTML   = buildBracketHTML(menSinglesBracket, true);
+function renderPdfBrackets(isBlank) {
+  document.getElementById('pdf-bracket-women').innerHTML = buildBracketHTML(womenDoublesBracket, true, false, isBlank);
+  document.getElementById('pdf-bracket-men').innerHTML   = buildBracketHTML(menSinglesBracket, true, false, isBlank);
 }
 
 /* =============================================
@@ -770,7 +798,7 @@ function _showBracket(tournamentId, categoryId, skipHistory) {
     <div class="brl-item conn"></div>
     <div class="brl-item r3">Finał</div>`;
 
-  bracketArea.innerHTML = buildBracketHTML(cat.bracket, false);
+  bracketArea.innerHTML = buildBracketHTML(cat.bracket, false, false, false);
   requestAnimationFrame(() => initBracketConnectors(bracketArea));
 }
 
@@ -829,13 +857,16 @@ function initBracketConnectors(container) {
    BRACKET HTML BUILDER
    ============================================= */
 
-function buildMatchCardHTML(match, isAdmin) {
+function buildMatchCardHTML(match, isAdmin, isBlank) {
   if (!match) return '';
   const aWins = match.winner === 'playerA';
   const bWins = match.winner === 'playerB';
 
   const renderScoreCells = (forPlayerA) =>
     match.score.map((s, i) => {
+      if (isBlank) {
+        return `<span class="score-cell blank-cell">□</span>`;
+      }
       const games = forPlayerA ? s.playerAGames : s.playerBGames;
       const opGames = forPlayerA ? s.playerBGames : s.playerAGames;
       if (isAdmin) {
@@ -877,7 +908,7 @@ function buildMatchCardHTML(match, isAdmin) {
       <div class="score-grid">${renderScoreCells(false)}</div>
     </div>`;
 
-  const winnerSelect = isAdmin ? `
+  const winnerSelect = isAdmin && !isBlank ? `
     <div class="winner-select-row">
       <select class="form-input winner-select-input" onchange="setMatchWinner('${match.id}', this.value)">
         <option value="">— Zwycięzca —</option>
@@ -895,10 +926,10 @@ function buildMatchCardHTML(match, isAdmin) {
     </div>`;
 }
 
-function buildBracketHTML(bData, compact, adminMode) {
+function buildBracketHTML(bData, compact, adminMode, isBlank) {
   const matchCard = (match) => {
     if (!match) return `<div class="b-match-placeholder"></div>`;
-    return buildMatchCardHTML(match, !!adminMode);
+    return buildMatchCardHTML(match, !!adminMode, !!isBlank);
   };
 
   const rounds = bData.r1 ? (bData.r2 ? [bData.r1, bData.r2, bData.qf, bData.sf, [bData.final]] : [bData.r1, bData.sf, [bData.final]]) : [[bData.final]];
@@ -976,7 +1007,7 @@ function rerenderMatch(matchId) {
     if (!match) return;
     const isAdmin = el.querySelector('.score-input') !== null;
     const tmp = document.createElement('div');
-    tmp.innerHTML = buildMatchCardHTML(match, isAdmin);
+    tmp.innerHTML = buildMatchCardHTML(match, isAdmin, false);
     el.replaceWith(tmp.firstElementChild);
   });
 }
@@ -1041,7 +1072,12 @@ function formatDate(dateStr) {
 }
 
 function badgeHtml(status) {
-  const map = { active: ['badge-active','Aktywny'], planned: ['badge-planned','Planowany'], finished: ['badge-finished','Zakończony'] };
+  const map = {
+    active:   ['badge-active',   'Aktywny'],
+    planned:  ['badge-planned',  'Planowany'],
+    finished: ['badge-finished', 'Zakończony'],
+    drawn:    ['badge-drawn',    'Rozlosowana']
+  };
   const [cls, label] = map[status] || ['badge-finished','Nieznany'];
   return `<span class="badge ${cls}">${label}</span>`;
 }
@@ -1050,6 +1086,621 @@ function pl(n, one, few, many) {
   if (n === 1) return one;
   if (n >= 2 && n <= 4) return few;
   return many;
+}
+
+/* =============================================
+   ADMIN — Tournament Detail View
+   ============================================= */
+
+function showTournamentDetail(tournamentId, skipHistory) {
+  const t = state.tournaments.find(t => t.id === tournamentId);
+  if (!t) return;
+  state.selectedTournamentId = tournamentId;
+
+  _showSection('tournament-detail', true);
+
+  // Render banner
+  document.getElementById('tournament-detail-banner').innerHTML = `
+    <div class="detail-hero-top">
+      <h1 style="color:#fff">${t.name}</h1>
+      ${badgeHtml(t.status)}
+      <button class="btn btn-secondary btn-sm" style="margin-left:auto" onclick="editTournament(${t.id})">✏️ Edytuj dane turnieju</button>
+    </div>
+    <div class="detail-hero-meta" style="margin-top:12px">
+      <div class="detail-hero-meta-item"><span class="icon">📅</span><span>${formatDate(t.dateStart)} – ${formatDate(t.dateEnd)}</span></div>
+      <div class="detail-hero-meta-item"><span class="icon">📍</span><span>${t.location}</span></div>
+    </div>`;
+
+  renderTournamentDetailCategories(tournamentId);
+  renderAdminBreadcrumb('tournament-detail', t);
+
+  document.getElementById('topbar-title').textContent = t.name;
+
+  if (!skipHistory) navigate('admin/tournaments/' + tournamentId);
+}
+
+function renderTournamentDetailCategories(tournamentId) {
+  const t = state.tournaments.find(t => t.id === tournamentId);
+  if (!t) return;
+
+  const container = document.getElementById('tournament-detail-categories');
+
+  if (t.categories.length === 0) {
+    container.innerHTML = `<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-title">Brak kategorii</div><div class="empty-desc">Dodaj pierwszą kategorię do turnieju.</div></div>`;
+    return;
+  }
+
+  container.innerHTML = t.categories.map(c => {
+    const pdfBtn = (c.status === 'drawn' || c.status === 'active' || c.status === 'finished')
+      ? `<button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();openPdfModal(${tournamentId})">📄 Generuj PDF</button>` : '';
+
+    return `
+    <div class="category-card-admin" onclick="showCategoryDetail(${tournamentId}, ${c.id})">
+      <div class="cat-card-top">
+        <div class="cat-card-name">${c.name}</div>
+        ${badgeHtml(c.status)}
+      </div>
+      <div class="cat-card-meta">
+        <span>📋 ${c.type}</span>
+        <span>👥 ${c.players} ${c.categoryType === 'singiel' ? 'zawodników' : 'par'}</span>
+        ${c.participants && c.participants.length > 0 ? `<span>✓ ${c.participants.length} zapisanych</span>` : ''}
+      </div>
+      <div class="cat-card-actions" onclick="event.stopPropagation()">
+        <button class="btn btn-primary btn-sm" onclick="showCategoryDetail(${tournamentId}, ${c.id})">Otwórz kategorię →</button>
+        ${pdfBtn}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function openAddCategoryModal() {
+  openModal('modal-add-category');
+}
+
+function saveNewCategory() {
+  const name = document.getElementById('nc-name').value.trim();
+  if (!name) { showToast('Podaj nazwę kategorii'); return; }
+
+  const t = state.tournaments.find(t => t.id === state.selectedTournamentId);
+  if (!t) return;
+
+  const maxId = Math.max(0, ...state.tournaments.flatMap(t => t.categories.map(c => c.id)));
+  const newCat = {
+    id: maxId + 1,
+    name,
+    players: parseInt(document.getElementById('nc-limit').value) || 8,
+    type: document.getElementById('nc-format').value === 'elimination' ? 'Drabinka' :
+          document.getElementById('nc-format').value === 'roundrobin' ? 'Każdy z każdym' : 'Grupy + play-off',
+    status: document.getElementById('nc-status').value || 'planned',
+    categoryType: document.getElementById('nc-type').value,
+    gender: document.getElementById('nc-gender').value,
+    level: document.getElementById('nc-level').value,
+    limit: parseInt(document.getElementById('nc-limit').value) || 8,
+    format: document.getElementById('nc-format').value,
+    seedsCount: parseInt(document.getElementById('nc-seeds').value) || 2,
+    dateStart: document.getElementById('nc-date').value || null,
+    timeStart: document.getElementById('nc-time').value || null,
+    bracket: null,
+    participants: []
+  };
+
+  t.categories.push(newCat);
+  closeModal('modal-add-category');
+  showToast(`Kategoria "${name}" została dodana.`);
+  renderTournamentDetailCategories(state.selectedTournamentId);
+
+  // Reset form
+  ['nc-name','nc-date','nc-time'].forEach(id => { document.getElementById(id).value = ''; });
+}
+
+/* =============================================
+   ADMIN — Category Detail View
+   ============================================= */
+
+function showCategoryDetail(tournamentId, categoryId, skipHistory) {
+  const t = state.tournaments.find(t => t.id === tournamentId);
+  if (!t) return;
+  const cat = t.categories.find(c => c.id === categoryId);
+  if (!cat) return;
+
+  state.selectedTournamentId = tournamentId;
+  state.selectedCategoryDetailId = categoryId;
+
+  _showSection('category-detail', true);
+  document.getElementById('topbar-title').textContent = cat.name;
+
+  // Breadcrumb
+  document.getElementById('category-detail-breadcrumb').innerHTML = `
+    <span class="bc-link" onclick="navigate('admin')">Dashboard</span>
+    <span class="breadcrumb-sep">/</span>
+    <span class="bc-link" onclick="showSection('tournaments')">Turnieje</span>
+    <span class="breadcrumb-sep">/</span>
+    <span class="bc-link" onclick="showTournamentDetail(${t.id})">${t.name}</span>
+    <span class="breadcrumb-sep">/</span>
+    <span class="bc-current">${cat.name}</span>`;
+
+  // Back button
+  document.getElementById('category-detail-back-btn').onclick = () => showTournamentDetail(tournamentId);
+
+  // Info panel
+  const typeLabels   = { singiel: 'Singiel', debel: 'Debel', mikst: 'Mikst' };
+  const genderLabels = { kobiety: 'Kobiety', mezczyzni: 'Mężczyźni', open: 'Open' };
+  const levelLabels  = { open: 'Open', poczatkujacy: 'Początkujący', sredniozaawansowany: 'Średniozaawansowany', zaawansowany: 'Zaawansowany' };
+  const formatLabels = { elimination: 'Drabinka single-elimination', groups: 'Grupy + play-off', roundrobin: 'Każdy z każdym' };
+
+  document.getElementById('category-info-panel').innerHTML = `
+    <div class="form-panel-title">Informacje o kategorii</div>
+    <div class="form-grid" style="grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px">
+      <div><div class="form-label">Nazwa</div><div style="font-weight:600">${cat.name}</div></div>
+      <div><div class="form-label">Typ</div><div>${typeLabels[cat.categoryType] || cat.categoryType || '—'}</div></div>
+      <div><div class="form-label">Płeć</div><div>${genderLabels[cat.gender] || cat.gender || '—'}</div></div>
+      <div><div class="form-label">Poziom</div><div>${levelLabels[cat.level] || cat.level || '—'}</div></div>
+      <div><div class="form-label">Format</div><div>${formatLabels[cat.format] || cat.type || '—'}</div></div>
+      <div><div class="form-label">Limit</div><div>${cat.limit || 8}</div></div>
+      <div><div class="form-label">Rozstawieni</div><div>${cat.seedsCount || 0}</div></div>
+      <div><div class="form-label">Status</div><div>${badgeHtml(cat.status)}</div></div>
+    </div>`;
+
+  // Action bar
+  renderCategoryActionBar(t, cat);
+
+  // Main content based on status
+  renderCategoryMainContent(t, cat);
+
+  if (!skipHistory) navigate('admin/tournaments/' + tournamentId + '/cat/' + categoryId);
+}
+
+function renderCategoryActionBar(t, cat) {
+  const bar = document.getElementById('category-action-bar');
+  let html = '';
+
+  if (cat.status === 'planned') {
+    const canDraw = cat.participants && cat.participants.length >= 2;
+    html = `
+      <button class="btn btn-primary draw-btn" ${canDraw ? '' : 'disabled title="Potrzebujesz co najmniej 2 uczestników"'}
+        onclick="openDrawModal(${t.id}, ${cat.id})">🎲 Losuj drabinkę</button>
+      <button class="btn btn-ghost btn-sm" onclick="openPdfModal(${t.id})">📄 PDF</button>`;
+  } else if (cat.status === 'drawn') {
+    html = `
+      <button class="btn btn-secondary btn-sm" onclick="openDrawModal(${t.id}, ${cat.id})">🔄 Ponów losowanie</button>
+      <button class="btn btn-primary btn-sm" onclick="startCategory(${t.id}, ${cat.id})">▶ Rozpocznij kategorię</button>
+      <button class="btn btn-ghost btn-sm" onclick="openPdfModal(${t.id})">📄 Generuj PDF do druku</button>`;
+  } else if (cat.status === 'active') {
+    html = `
+      <button class="btn btn-ghost btn-sm" onclick="openPdfModal(${t.id})">📄 Generuj PDF</button>`;
+  } else if (cat.status === 'finished') {
+    html = `
+      <button class="btn btn-ghost btn-sm" onclick="openPdfModal(${t.id})">📄 Generuj finalny PDF</button>`;
+  }
+
+  bar.innerHTML = `<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px">${html}</div>`;
+}
+
+function renderCategoryMainContent(t, cat) {
+  const container = document.getElementById('category-main-content');
+
+  if (cat.status === 'planned') {
+    container.innerHTML = renderParticipantsSection(t, cat);
+  } else if (cat.status === 'drawn') {
+    container.innerHTML = `
+      <div class="form-panel">
+        <div class="form-panel-title">Drabinka (podgląd)</div>
+        ${cat.bracket ? buildBracketHTML(cat.bracket, false, false, false) : '<div class="empty-state"><div class="empty-icon">🔜</div><div class="empty-title">Brak drabinki</div></div>'}
+      </div>`;
+    if (cat.bracket) {
+      requestAnimationFrame(() => {
+        const scroll = container.querySelector('.bracket-flex');
+        if (scroll) initBracketConnectors(scroll.parentElement);
+      });
+    }
+  } else if (cat.status === 'active') {
+    container.innerHTML = `
+      <div class="form-panel">
+        <div class="form-panel-title">Drabinka (tryb admin — edycja wyników)</div>
+        ${cat.bracket ? buildBracketHTML(cat.bracket, false, true, false) : '<div class="empty-state"><div class="empty-icon">🔜</div><div class="empty-title">Brak drabinki</div></div>'}
+      </div>`;
+    if (cat.bracket) {
+      requestAnimationFrame(() => {
+        const scroll = container.querySelector('.bracket-flex');
+        if (scroll) initBracketConnectors(scroll.parentElement);
+      });
+    }
+  } else if (cat.status === 'finished') {
+    container.innerHTML = `
+      <div class="form-panel">
+        <div class="form-panel-title">Drabinka (zakończona)</div>
+        ${cat.bracket ? buildBracketHTML(cat.bracket, false, false, false) : '<div class="empty-state"><div class="empty-icon">🏆</div><div class="empty-title">Brak danych drabinki</div></div>'}
+      </div>`;
+    if (cat.bracket) {
+      requestAnimationFrame(() => {
+        const scroll = container.querySelector('.bracket-flex');
+        if (scroll) initBracketConnectors(scroll.parentElement);
+      });
+    }
+  }
+}
+
+function startCategory(tournamentId, categoryId) {
+  const t = state.tournaments.find(t => t.id === tournamentId);
+  if (!t) return;
+  const cat = t.categories.find(c => c.id === categoryId);
+  if (!cat) return;
+  cat.status = 'active';
+  showToast('Kategoria została aktywowana!');
+  showCategoryDetail(tournamentId, categoryId, true);
+}
+
+/* =============================================
+   ADMIN — Participants Section
+   ============================================= */
+
+function renderParticipantsSection(t, cat) {
+  const participants = cat.participants || [];
+  const isDoubles = cat.categoryType === 'debel' || cat.categoryType === 'mikst';
+  const limit = cat.limit || 8;
+  const maxSeeds = Math.floor(limit / 4);
+
+  const tableHeaders = isDoubles
+    ? `<th>Lp.</th><th>Para (Zawodnik 1 / Zawodnik 2)</th><th>Klub/Miasto</th><th>Ranking</th><th>Rozstawiony</th><th>Akcje</th>`
+    : `<th>Lp.</th><th>Zawodnik</th><th>Klub/Miasto</th><th>Ranking</th><th>Rozstawiony</th><th>Akcje</th>`;
+
+  const tableRows = participants.map((p, i) => {
+    const seedInput = p.seed !== null ? `<input type="number" class="form-input" style="width:60px;display:inline-block;padding:4px 6px" min="1" max="${maxSeeds}" value="${p.seed}" onchange="updateParticipantSeed(${t.id}, ${cat.id}, '${p.id}', this.value)"/>` : '';
+    return `
+      <tr>
+        <td>${i + 1}</td>
+        <td>${isDoubles ? `<strong>${p.name1}</strong> / ${p.name2 || '<em style="color:var(--text-muted)">brak</em>'}` : `<strong>${p.name1}</strong>`}</td>
+        <td>${p.club || '—'}</td>
+        <td>${p.ranking || '—'}</td>
+        <td>
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer">
+            <input type="checkbox" ${p.seed !== null ? 'checked' : ''} onchange="toggleParticipantSeed(${t.id}, ${cat.id}, '${p.id}', this.checked)"/>
+            <span>Rozstawiony</span>
+          </label>
+          ${seedInput}
+        </td>
+        <td>
+          <button class="btn btn-ghost btn-sm" onclick="removeParticipant(${t.id}, ${cat.id}, '${p.id}')">✕ Usuń</button>
+        </td>
+      </tr>`;
+  }).join('');
+
+  const addFormHtml = isDoubles ? `
+    <div id="add-participant-form-${cat.id}" class="participant-add-form hidden">
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr auto;gap:8px;align-items:end">
+        <div><label class="form-label">Zawodnik 1</label><input class="form-input" id="np-name1-${cat.id}" placeholder="Imię Nazwisko"/></div>
+        <div><label class="form-label">Zawodnik 2</label><input class="form-input" id="np-name2-${cat.id}" placeholder="Imię Nazwisko"/></div>
+        <div><label class="form-label">Klub</label><input class="form-input" id="np-club-${cat.id}" placeholder="Klub/Miasto"/></div>
+        <div><label class="form-label">Ranking</label><input class="form-input" id="np-ranking-${cat.id}" placeholder="np. 450"/></div>
+        <button class="btn btn-primary" onclick="addParticipant(${t.id}, ${cat.id})">Dodaj</button>
+      </div>
+    </div>` : `
+    <div id="add-participant-form-${cat.id}" class="participant-add-form hidden">
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:8px;align-items:end">
+        <div><label class="form-label">Imię i nazwisko</label><input class="form-input" id="np-name1-${cat.id}" placeholder="Imię Nazwisko"/></div>
+        <div><label class="form-label">Klub</label><input class="form-input" id="np-club-${cat.id}" placeholder="Klub/Miasto"/></div>
+        <div><label class="form-label">Ranking</label><input class="form-input" id="np-ranking-${cat.id}" placeholder="np. 450"/></div>
+        <button class="btn btn-primary" onclick="addParticipant(${t.id}, ${cat.id})">Dodaj</button>
+      </div>
+    </div>`;
+
+  return `
+    <div class="form-panel">
+      <div class="form-panel-title">
+        Uczestnicy — Drabinka ${limit} ${isDoubles ? 'par' : 'zawodników'} — maksymalnie ${maxSeeds} rozstawień
+      </div>
+      <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
+        <button class="btn btn-secondary btn-sm" onclick="toggleAddParticipantForm(${cat.id})">➕ Dodaj uczestnika${isDoubles ? '/parę' : ''}</button>
+        <button class="btn btn-ghost btn-sm" onclick="addMockParticipants(${t.id}, ${cat.id})">🎾 Dodaj przykładowe ${isDoubles ? 'pary' : 'zawodników'}</button>
+      </div>
+      ${addFormHtml}
+      ${participants.length > 0 ? `
+        <div class="participants-table-wrap">
+          <table class="participants-table">
+            <thead><tr>${tableHeaders}</tr></thead>
+            <tbody>${tableRows}</tbody>
+          </table>
+        </div>` : `<div class="empty-state" style="padding:30px"><div class="empty-icon">👥</div><div class="empty-title">Brak uczestników</div><div class="empty-desc">Dodaj uczestników ręcznie lub skorzystaj z przykładowych danych.</div></div>`}
+    </div>`;
+}
+
+function toggleAddParticipantForm(catId) {
+  const form = document.getElementById(`add-participant-form-${catId}`);
+  if (form) form.classList.toggle('hidden');
+}
+
+function addParticipant(tournamentId, categoryId) {
+  const t = state.tournaments.find(t => t.id === tournamentId);
+  if (!t) return;
+  const cat = t.categories.find(c => c.id === categoryId);
+  if (!cat) return;
+
+  const name1 = document.getElementById(`np-name1-${cat.id}`)?.value.trim();
+  const name2El = document.getElementById(`np-name2-${cat.id}`);
+  const name2 = name2El ? name2El.value.trim() : null;
+  const club = document.getElementById(`np-club-${cat.id}`)?.value.trim() || '';
+  const ranking = document.getElementById(`np-ranking-${cat.id}`)?.value.trim() || '';
+
+  if (!name1) { showToast('Podaj imię i nazwisko'); return; }
+
+  if (!cat.participants) cat.participants = [];
+  cat.participants.push({
+    id: 'p' + Date.now(),
+    name1,
+    name2: name2 || null,
+    club,
+    ranking,
+    seed: null,
+    status: 'confirmed'
+  });
+  cat.players = cat.participants.length;
+
+  showToast('Uczestnik dodany');
+  showCategoryDetail(tournamentId, categoryId, true);
+}
+
+function removeParticipant(tournamentId, categoryId, participantId) {
+  const t = state.tournaments.find(t => t.id === tournamentId);
+  if (!t) return;
+  const cat = t.categories.find(c => c.id === categoryId);
+  if (!cat) return;
+  cat.participants = (cat.participants || []).filter(p => p.id !== participantId);
+  cat.players = cat.participants.length;
+  showToast('Uczestnik usunięty');
+  showCategoryDetail(tournamentId, categoryId, true);
+}
+
+function toggleParticipantSeed(tournamentId, categoryId, participantId, checked) {
+  const t = state.tournaments.find(t => t.id === tournamentId);
+  if (!t) return;
+  const cat = t.categories.find(c => c.id === categoryId);
+  if (!cat) return;
+  const p = (cat.participants || []).find(p => p.id === participantId);
+  if (!p) return;
+  p.seed = checked ? 1 : null;
+  showCategoryDetail(tournamentId, categoryId, true);
+}
+
+function updateParticipantSeed(tournamentId, categoryId, participantId, val) {
+  const t = state.tournaments.find(t => t.id === tournamentId);
+  if (!t) return;
+  const cat = t.categories.find(c => c.id === categoryId);
+  if (!cat) return;
+  const p = (cat.participants || []).find(p => p.id === participantId);
+  if (!p) return;
+  const num = parseInt(val);
+  const maxSeeds = Math.floor((cat.limit || 8) / 4);
+  if (isNaN(num) || num < 1 || num > maxSeeds) { showToast('Nieprawidłowy numer rozstawienia'); return; }
+  const duplicate = (cat.participants || []).find(other => other.id !== participantId && other.seed === num);
+  if (duplicate) { showToast('Numer rozstawienia już jest zajęty'); return; }
+  p.seed = num;
+}
+
+function addMockParticipants(tournamentId, categoryId) {
+  const t = state.tournaments.find(t => t.id === tournamentId);
+  if (!t) return;
+  const cat = t.categories.find(c => c.id === categoryId);
+  if (!cat) return;
+
+  if (!cat.participants) cat.participants = [];
+
+  const isDoubles = cat.categoryType === 'debel' || cat.categoryType === 'mikst';
+  const isFemale  = cat.gender === 'kobiety';
+  const isMale    = cat.gender === 'mezczyzni';
+  const isMixed   = cat.categoryType === 'mikst';
+
+  let mockData;
+
+  if (isMixed) {
+    mockData = [
+      { name1: 'Nowak Piotr',        name2: 'Kowalska Anna',      club: 'Legia TC Warszawa', ranking: '520' },
+      { name1: 'Wiśniewski Krzysztof', name2: 'Kamińska Monika',  club: 'ATC Kraków',        ranking: '480' },
+      { name1: 'Dąbrowski Marek',    name2: 'Zielińska Katarzyna', club: 'WTC Wrocław',      ranking: '450' },
+      { name1: 'Kaczmarek Rafał',    name2: 'Szymańska Beata',    club: 'GTK Gdańsk',        ranking: '420' },
+      { name1: 'Lewandowski Tomasz', name2: 'Wójcik Ewa',         club: 'Kortex Warszawa',   ranking: '390' },
+      { name1: 'Piotrowski Jacek',   name2: 'Malinowska Joanna',  club: 'TC Poznań',         ranking: '360' },
+      { name1: 'Zieliński Bartosz',  name2: 'Nowakowska Maria',   club: 'Legia TC Warszawa', ranking: '340' },
+      { name1: 'Adamski Grzegorz',   name2: 'Kwiatkowska Izabela',club: 'ATC Kraków',        ranking: '310' },
+    ];
+  } else if (isDoubles && isFemale) {
+    mockData = [
+      { name1: 'Kowalska Anna',      name2: 'Wiśniewska Barbara',  club: 'Legia TC Warszawa', ranking: '510' },
+      { name1: 'Kamińska Monika',    name2: 'Wójcik Ewa',          club: 'ATC Kraków',        ranking: '480' },
+      { name1: 'Szymańska Beata',    name2: 'Woźniak Agnieszka',   club: 'WTC Wrocław',       ranking: '455' },
+      { name1: 'Malinowska Joanna',  name2: 'Piotrowska Karolina', club: 'GTK Gdańsk',        ranking: '425' },
+      { name1: 'Kwiatkowska Izabela',name2: 'Adamska Natalia',     club: 'Kortex Warszawa',   ranking: '400' },
+      { name1: 'Nowakowska Maria',   name2: 'Dąbrowska Marta',     club: 'TC Poznań',         ranking: '370' },
+      { name1: 'Zielińska Katarzyna',name2: 'Lewandowska Renata',  club: 'Legia TC Warszawa', ranking: '345' },
+      { name1: 'Jankowska Dorota',   name2: 'Kozłowska Paulina',   club: 'ATC Kraków',        ranking: '315' },
+    ];
+  } else if (isDoubles && isMale) {
+    mockData = [
+      { name1: 'Nowak Adam',         name2: 'Kowalski Jan',        club: 'Legia TC Warszawa', ranking: '540' },
+      { name1: 'Wiśniewski Piotr',   name2: 'Dąbrowski Marek',     club: 'ATC Kraków',        ranking: '510' },
+      { name1: 'Kaczmarek Rafał',    name2: 'Lewandowski Tomasz',  club: 'WTC Wrocław',       ranking: '475' },
+      { name1: 'Zieliński Bartosz',  name2: 'Szymański Bogdan',    club: 'GTK Gdańsk',        ranking: '445' },
+      { name1: 'Piotrowski Krzysztof',name2: 'Wróbel Andrzej',    club: 'Kortex Warszawa',   ranking: '415' },
+      { name1: 'Dudek Łukasz',       name2: 'Wójcik Sławomir',     club: 'TC Poznań',         ranking: '385' },
+      { name1: 'Michalski Jacek',    name2: 'Jankowski Paweł',     club: 'Legia TC Warszawa', ranking: '355' },
+      { name1: 'Wojciechowski Robert',name2: 'Adamski Grzegorz',   club: 'ATC Kraków',        ranking: '325' },
+    ];
+  } else if (isFemale) {
+    mockData = [
+      { name1: 'Kowalska Anna',       club: 'Legia TC Warszawa', ranking: '510' },
+      { name1: 'Wiśniewska Barbara',  club: 'ATC Kraków',        ranking: '480' },
+      { name1: 'Kamińska Monika',     club: 'WTC Wrocław',       ranking: '455' },
+      { name1: 'Wójcik Ewa',          club: 'GTK Gdańsk',        ranking: '425' },
+      { name1: 'Szymańska Beata',     club: 'Kortex Warszawa',   ranking: '400' },
+      { name1: 'Malinowska Joanna',   club: 'TC Poznań',         ranking: '370' },
+      { name1: 'Kwiatkowska Izabela', club: 'Legia TC Warszawa', ranking: '345' },
+      { name1: 'Nowakowska Maria',    club: 'ATC Kraków',        ranking: '315' },
+    ];
+  } else {
+    mockData = [
+      { name1: 'Nowak Adam',        club: 'Legia TC Warszawa', ranking: '540' },
+      { name1: 'Kowalski Jan',      club: 'ATC Kraków',        ranking: '510' },
+      { name1: 'Wiśniewski Piotr',  club: 'WTC Wrocław',       ranking: '475' },
+      { name1: 'Dąbrowski Marek',   club: 'GTK Gdańsk',        ranking: '445' },
+      { name1: 'Kaczmarek Rafał',   club: 'Kortex Warszawa',   ranking: '415' },
+      { name1: 'Lewandowski Tomasz',club: 'TC Poznań',         ranking: '385' },
+      { name1: 'Zieliński Bartosz', club: 'Legia TC Warszawa', ranking: '355' },
+      { name1: 'Szymański Bogdan',  club: 'ATC Kraków',        ranking: '325' },
+    ];
+  }
+
+  mockData.forEach(d => {
+    cat.participants.push({
+      id: 'p' + Date.now() + Math.random(),
+      name1: d.name1,
+      name2: d.name2 || null,
+      club: d.club,
+      ranking: d.ranking,
+      seed: null,
+      status: 'confirmed'
+    });
+  });
+
+  cat.players = cat.participants.length;
+  showToast('Dodano przykładowych uczestników');
+  showCategoryDetail(tournamentId, categoryId, true);
+}
+
+/* =============================================
+   ADMIN — Draw Algorithm
+   ============================================= */
+
+function openDrawModal(tournamentId, categoryId) {
+  const t = state.tournaments.find(t => t.id === tournamentId);
+  if (!t) return;
+  const cat = t.categories.find(c => c.id === categoryId);
+  if (!cat) return;
+
+  const participants = cat.participants || [];
+  const n = participants.length;
+  const S = nextPow2(Math.max(n, 2));
+  const byes = S - n;
+  const seeds = participants.filter(p => p.seed !== null).length;
+
+  document.getElementById('modal-draw-info').innerHTML = `
+    <strong>${cat.name}</strong><br>
+    Uczestników: <strong>${n}</strong><br>
+    Rozmiar drabinki: <strong>${S}</strong><br>
+    Bye: <strong>${byes}</strong><br>
+    Rozstawionych: <strong>${seeds}</strong><br>
+    ${cat.bracket ? '<span style="color:var(--accent)">⚠️ Uwaga: drabinka zostanie nadpisana!</span>' : ''}`;
+
+  state._pendingDraw = { tournamentId, categoryId };
+  openModal('modal-draw');
+}
+
+function nextPow2(n) {
+  let s = 1;
+  while (s < n) s *= 2;
+  return Math.min(s, 32);
+}
+
+function executeDraw() {
+  closeModal('modal-draw');
+  const { tournamentId, categoryId } = state._pendingDraw || {};
+  if (!tournamentId || !categoryId) return;
+
+  const t = state.tournaments.find(t => t.id === tournamentId);
+  if (!t) return;
+  const cat = t.categories.find(c => c.id === categoryId);
+  if (!cat) return;
+
+  const participants = cat.participants || [];
+  const n = participants.length;
+  const S = nextPow2(Math.max(n, 2));
+  const slots = new Array(S).fill(null);
+
+  // Place seeds
+  const seeded = participants.filter(p => p.seed !== null).sort((a, b) => a.seed - b.seed);
+  const seedPositions = getSeedPositions(S);
+  seeded.forEach((p, i) => {
+    if (i < seedPositions.length) slots[seedPositions[i]] = p;
+  });
+
+  // Shuffle non-seeded
+  const nonSeeded = participants.filter(p => p.seed === null);
+  shuffle(nonSeeded);
+
+  // Fill remaining slots with non-seeded, then BYEs
+  const emptySlots = slots.map((s, i) => s === null ? i : -1).filter(i => i >= 0);
+  nonSeeded.forEach((p, i) => { if (i < emptySlots.length) slots[emptySlots[i]] = p; });
+
+  // Build first-round matches
+  const totalMatches = S / 2;
+  const r1Matches = [];
+  let matchCounter = 1;
+
+  for (let i = 0; i < totalMatches; i++) {
+    const pA = slots[i * 2];
+    const pB = slots[i * 2 + 1];
+    const aName = pA ? (pA.name2 ? `${pA.name1} / ${pA.name2}` : pA.name1) : 'BYE';
+    const bName = pB ? (pB.name2 ? `${pB.name1} / ${pB.name2}` : pB.name1) : 'BYE';
+    const aSeed = pA ? pA.seed : null;
+    const bSeed = pB ? pB.seed : null;
+
+    let winner = null;
+    let status = 'pending';
+    if (!pA || !pB) {
+      winner = !pA ? 'playerB' : 'playerA';
+      status = 'finished';
+    }
+
+    const match = {
+      id: `draw-r1-${matchCounter++}`,
+      round: 'Runda 1',
+      status,
+      playerA: { name: aName, seed: aSeed },
+      playerB: { name: bName, seed: bSeed },
+      score: [
+        { playerAGames: null, playerBGames: null, tieBreakSmallPoints: null },
+        { playerAGames: null, playerBGames: null, tieBreakSmallPoints: null },
+        { playerAGames: null, playerBGames: null, tieBreakSmallPoints: null },
+      ],
+      winner
+    };
+    r1Matches.push(match);
+  }
+
+  // Build subsequent TBD rounds
+  let bracket;
+  const numSf = totalMatches / 2;
+  const sfMatches = [];
+  for (let i = 0; i < numSf; i++) {
+    sfMatches.push(mkMatch(`draw-sf-${i+1}`, 'Półfinał', 'TBD', null, 'TBD', null, null,null, null,null, null,null, null,null,null, null));
+  }
+  const final = mkMatch(`draw-f`, 'Finał', 'TBD', null, 'TBD', null, null,null, null,null, null,null, null,null,null, null);
+  bracket = { r1: r1Matches, sf: sfMatches, final };
+
+  cat.bracket = bracket;
+  cat.status = 'drawn';
+
+  showToast('Drabinka wylosowana!');
+  showCategoryDetail(tournamentId, categoryId, true);
+}
+
+function getSeedPositions(S) {
+  const positions = [];
+  if (S >= 2)  positions.push(0);
+  if (S >= 2)  positions.push(S - 1);
+  if (S >= 4)  positions.push(S / 2);
+  if (S >= 4)  positions.push(S / 2 - 1);
+  if (S >= 8)  positions.push(S / 4);
+  if (S >= 8)  positions.push(S / 4 * 3 - 1);
+  if (S >= 16) positions.push(S / 8);
+  if (S >= 16) positions.push(S / 8 * 7 - 1);
+  return positions;
+}
+
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
 }
 
 /* =============================================
