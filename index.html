@@ -310,9 +310,6 @@
           <span class="si-icon">➕</span> Dodaj turniej
         </button>
         <div class="sidebar-section-label">System</div>
-        <button class="sidebar-item" id="nav-migration" onclick="showSection('migration')">
-          <span class="si-icon">📦</span> Migracja danych
-        </button>
         <button class="sidebar-item" id="nav-settings" onclick="showSection('settings')">
           <span class="si-icon">⚙️</span> Ustawienia
         </button>
@@ -633,11 +630,6 @@
         <button class="btn btn-primary" onclick="showToast('Ustawienia zostały zapisane.')">💾 Zapisz ustawienia</button>
       </div>
 
-      <!-- ====== SECTION: Migration ====== -->
-      <div id="sec-migration" class="admin-section-content hidden">
-        <div id="migration-content"></div>
-      </div>
-
       <!-- ====== SECTION: Tournament List ====== -->
       <div id="sec-tournaments" class="admin-section-content hidden">
         <div class="section-header">
@@ -646,14 +638,6 @@
             <div class="section-sub">Zarządzaj swoimi turniejami</div>
           </div>
           <button class="btn btn-primary btn-sm" onclick="showSection('add-tournament')">➕ Dodaj turniej</button>
-        </div>
-        <div class="filter-tabs" id="tournament-filter-tabs">
-          <button class="filter-tab active" data-filter="all" onclick="setTournamentFilter('all')">Wszystkie</button>
-          <button class="filter-tab" data-filter="planned" onclick="setTournamentFilter('planned')">Planowane</button>
-          <button class="filter-tab" data-filter="active" onclick="setTournamentFilter('active')">Aktywne</button>
-          <button class="filter-tab" data-filter="finished" onclick="setTournamentFilter('finished')">Zakończone</button>
-          <button class="filter-tab" data-filter="archived" onclick="setTournamentFilter('archived')">Archiwalne</button>
-          <button class="filter-tab" data-filter="teniqo" onclick="setTournamentFilter('teniqo')">Zaimportowane z TENIQO</button>
         </div>
         <div class="tournament-table-wrap">
           <table class="t-table" id="admin-tournament-table">
