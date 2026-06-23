@@ -17,54 +17,72 @@ const mockOrganizer = {
 };
 
 /* ---- Bracket data helpers ---- */
-// match(p1name, p1score, p2name, p2score, winnerIndex)  1 = p1 wins, 2 = p2 wins
-function m(p1, s1, p2, s2, w) {
-  return { p1, s1, p2, s2, winner: w === 1 ? p1 : p2 };
+function mkMatch(idSuffix, round, pAname, pAseed, pBname, pBseed, sA1, sA2, sA3, sB1, sB2, sB3, tbA1, tbA2, tbA3, tbB1, tbB2, tbB3, winner) {
+  return {
+    id: 'match-' + idSuffix,
+    round,
+    status: (sA1 !== null || sB1 !== null) ? 'finished' : 'pending',
+    playerA: { name: pAname, seed: pAseed },
+    playerB: { name: pBname, seed: pBseed },
+    score: {
+      playerA: [
+        { games: sA1, tiebreak: tbA1 ?? null },
+        { games: sA2, tiebreak: tbA2 ?? null },
+        { games: sA3, tiebreak: tbA3 ?? null },
+      ],
+      playerB: [
+        { games: sB1, tiebreak: tbB1 ?? null },
+        { games: sB2, tiebreak: tbB2 ?? null },
+        { games: sB3, tiebreak: tbB3 ?? null },
+      ]
+    },
+    winner // 'playerA' | 'playerB' | null
+  };
 }
 
 const womenDoublesBracket = {
   r1: [
-    m("Kowalska / Wiśniewska", "6-4, 6-2", "Nowakowska / Dąbrowska", "4-6, 2-6", 1),
-    m("Kamińska / Wójcik",     "7-5, 6-3", "Lewandowska / Zielińska","5-7, 3-6", 1),
-    m("Szymańska / Woźniak",   "6-1, 6-4", "Kozłowska / Jankowska",  "1-6, 4-6", 1),
-    m("Malinowska / Piotrowska","4-6, 6-3, 6-4","Kwiatkowska / Adamska","6-4, 3-6, 4-6",1),
+    mkMatch('w-r1-1','Runda 1','Kowalska / Wiśniewska',1,'Nowakowska / Dąbrowska',null, 6,6,null, 4,2,null, null,null,null,null,null,null,'playerA'),
+    mkMatch('w-r1-2','Runda 1','Kamińska / Wójcik',3,'Lewandowska / Zielińska',null, 7,6,null, 5,3,null, null,null,null,null,null,null,'playerA'),
+    mkMatch('w-r1-3','Runda 1','Szymańska / Woźniak',2,'Kozłowska / Jankowska',null, 6,6,null, 1,4,null, null,null,null,null,null,null,'playerA'),
+    mkMatch('w-r1-4','Runda 1','Malinowska / Piotrowska',4,'Kwiatkowska / Adamska',null, 4,6,6, 6,3,4, null,null,null,null,null,null,'playerA'),
   ],
   sf: [
-    m("Kowalska / Wiśniewska","6-3, 7-6","Kamińska / Wójcik","3-6, 6-7",1),
-    m("Szymańska / Woźniak",  "6-2, 6-4","Malinowska / Piotrowska","2-6, 4-6",1),
+    mkMatch('w-sf-1','Półfinał','Kowalska / Wiśniewska',1,'Kamińska / Wójcik',3, 6,7,null, 3,6,null, null,6,null,null,4,null,'playerA'),
+    mkMatch('w-sf-2','Półfinał','Szymańska / Woźniak',2,'Malinowska / Piotrowska',4, 6,6,null, 2,4,null, null,null,null,null,null,null,'playerA'),
   ],
-  final: m("Kowalska / Wiśniewska","7-5, 6-4","Szymańska / Woźniak","5-7, 4-6",1),
-  winner: "Kowalska / Wiśniewska"
+  final: mkMatch('w-f','Finał','Kowalska / Wiśniewska',1,'Szymańska / Woźniak',2, 7,6,null, 5,4,null, null,null,null,null,null,null,'playerA'),
+  winner: 'Kowalska / Wiśniewska'
 };
 
 const menSinglesBracket = {
   r1: [
-    m("Nowak Adam",     "6-3, 7-5", "Kowalski Jan",    "3-6, 5-7", 1),
-    m("Wiśniewski P.",  "6-4, 6-2", "Dąbrowski M.",    "4-6, 2-6", 1),
-    m("Kaczmarek R.",   "7-6, 4-6, 6-3", "Lewandowski K.", "6-7, 6-4, 3-6", 1),
-    m("Zielński T.",    "6-1, 6-3", "Szymański B.",    "1-6, 3-6", 1),
+    mkMatch('m-r1-1','Runda 1','Nowak Adam',1,'Kowalski Jan',null, 6,7,null, 3,5,null, null,null,null,null,null,null,'playerA'),
+    mkMatch('m-r1-2','Runda 1','Wiśniewski P.',3,'Dąbrowski M.',null, 6,6,null, 4,2,null, null,null,null,null,null,null,'playerA'),
+    mkMatch('m-r1-3','Runda 1','Kaczmarek R.',2,'Lewandowski K.',null, 7,4,6, 6,6,3, 6,null,null,7,null,null,'playerA'),
+    mkMatch('m-r1-4','Runda 1','Zieliński T.',4,'Szymański B.',null, 6,6,null, 1,3,null, null,null,null,null,null,null,'playerA'),
   ],
   sf: [
-    m("Nowak Adam",    "6-4, 6-3", "Wiśniewski P.","4-6, 3-6",1),
-    m("Kaczmarek R.",  "7-5, 6-4", "Zielński T.",  "5-7, 4-6",1),
+    mkMatch('m-sf-1','Półfinał','Nowak Adam',1,'Wiśniewski P.',3, 6,6,null, 4,3,null, null,null,null,null,null,null,'playerA'),
+    mkMatch('m-sf-2','Półfinał','Kaczmarek R.',2,'Zieliński T.',4, 7,6,null, 5,4,null, null,null,null,null,null,null,'playerA'),
   ],
-  final: m("Nowak Adam","6-4, 7-6","Kaczmarek R.","4-6, 6-7",1),
-  winner: "Nowak Adam"
+  final: mkMatch('m-f','Finał','Nowak Adam',1,'Kaczmarek R.',2, 6,7,null, 4,6,null, null,6,null,null,4,null,'playerA'),
+  winner: 'Nowak Adam'
 };
 
 const mixedOpenBracket = {
   r1: [
-    m("Nowak / Kamińska",  "6-2, 6-3", "Kowalski / Wójcik",     "2-6, 3-6", 1),
-    m("Wiśniewski / Nowakowska","7-5, 6-4","Dąbrowski / Zielińska","5-7, 4-6",1),
-    m("Kaczmarek / Szymańska","6-3, 6-1","Lewandowski / Kozłowska","3-6, 1-6",1),
-    m("Zieliński / Malinowska","walkover","Piotrowski / Kwiatkowska","w/o",1),
+    mkMatch('x-r1-1','Runda 1','Nowak / Kamińska',1,'Kowalski / Wójcik',null, 6,6,null, 2,3,null, null,null,null,null,null,null,'playerA'),
+    mkMatch('x-r1-2','Runda 1','Wiśniewski / Nowakowska',3,'Dąbrowski / Zielińska',null, 7,6,null, 5,4,null, null,null,null,null,null,null,'playerA'),
+    mkMatch('x-r1-3','Runda 1','Kaczmarek / Szymańska',2,'Lewandowski / Kozłowska',null, 6,6,null, 3,1,null, null,null,null,null,null,null,'playerA'),
+    mkMatch('x-r1-4','Runda 1','Zieliński / Malinowska',4,'Piotrowski / Kwiatkowska',null, null,null,null, null,null,null, null,null,null,null,null,null,'playerA'),
   ],
   sf: [
-    m("Nowak / Kamińska","6-4, 7-6","Wiśniewski / Nowakowska","4-6, 6-7",1),
-    m("Kaczmarek / Szymańska","6-2, 6-3","Zieliński / Malinowska","2-6, 3-6",1),
+    mkMatch('x-sf-1','Półfinał','Nowak / Kamińska',1,'Wiśniewski / Nowakowska',3, 6,7,null, 4,6,null, null,6,null,null,4,null,'playerA'),
+    mkMatch('x-sf-2','Półfinał','Kaczmarek / Szymańska',2,'Zieliński / Malinowska',4, 6,6,null, 2,3,null, null,null,null,null,null,null,'playerA'),
   ],
-  final: m("Nowak / Kamińska","7-6, 4-6, 6-4","Kaczmarek / Szymańska","6-7, 6-4, 4-6",1),
-  winner: "Nowak / Kamińska"
+  final: mkMatch('x-f','Finał','Nowak / Kamińska',1,'Kaczmarek / Szymańska',2, 7,4,6, 6,6,4, 6,null,null,4,null,null,'playerA'),
+  winner: 'Nowak / Kamińska'
 };
 
 const mockTournaments = [
@@ -666,81 +684,174 @@ function showBracket(tournamentId, categoryId) {
 
 /* =============================================
    BRACKET HTML BUILDER
-   Height=560, R1 centers: 70,210,350,490; R2: 140,420; R3: 280
    ============================================= */
 
-function buildBracketHTML(bData, compact) {
-  const h = compact ? 500 : 560; // bracket container height
-  const mw = compact ? 180 : 220;  // match width
-  const cw = 60;                   // connector width
+function buildBracketHTML(bData, compact, adminMode) {
+  const h  = compact ? 520 : 600;
+  const mw = compact ? 260 : 300;
+  const cw = 50;
 
-  // R1 centers (space-around, 4 items)
   const r1 = [h/8, h*3/8, h*5/8, h*7/8];
-  // R2 centers (space-around, 2 items)
   const r2 = [h/4, h*3/4];
-  // R3 center
   const r3 = h/2;
 
+  const scoreCell = (set, isAdmin, matchId, side, setIdx) => {
+    const val = set.games;
+    const tb  = set.tiebreak;
+    if (isAdmin) {
+      return `<div class="score-cell-wrap">
+        <input class="score-input" type="number" min="0" max="7"
+          value="${val !== null ? val : ''}" placeholder="–"
+          data-match="${matchId}" data-side="${side}" data-set="${setIdx}"
+          onchange="updateMatchScore(this)"/>
+        <input class="tb-input" type="number" min="0" max="99"
+          value="${tb !== null ? tb : ''}" placeholder=""
+          data-match="${matchId}" data-side="${side}" data-set="${setIdx}" data-tb="1"
+          onchange="updateMatchScore(this)"/>
+      </div>`;
+    }
+    if (val === null) return `<span class="score-cell muted">.</span>`;
+    return `<span class="score-cell">${val}${tb !== null ? `<sup>${tb}</sup>` : ''}</span>`;
+  };
+
   const matchCard = (match) => {
-    if (!match) return '<div style="height:72px"></div>';
-    const p1w = match.winner === match.p1;
-    const p2w = match.winner === match.p2;
+    if (!match) return `<div style="height:88px"></div>`;
+    const aWins = match.winner === 'playerA';
+    const bWins = match.winner === 'playerB';
+    const isAdmin = !!adminMode;
+    const pending = match.status === 'pending';
+
+    const rowA = `
+      <div class="match-row ${aWins ? 'is-winner' : ''}">
+        <div class="player-info">
+          ${aWins ? '<span class="winner-badge">W</span>' : '<span class="winner-badge-placeholder"></span>'}
+          ${match.playerA.seed ? `<span class="player-seed">${match.playerA.seed}</span>` : ''}
+          <span class="player-name">${match.playerA.name}</span>
+        </div>
+        <div class="score-grid">
+          ${match.score.playerA.map((s,i) => scoreCell(s, isAdmin, match.id, 'playerA', i)).join('')}
+        </div>
+      </div>`;
+
+    const rowB = `
+      <div class="match-row ${bWins ? 'is-winner' : ''}">
+        <div class="player-info">
+          ${bWins ? '<span class="winner-badge">W</span>' : '<span class="winner-badge-placeholder"></span>'}
+          ${match.playerB.seed ? `<span class="player-seed">${match.playerB.seed}</span>` : ''}
+          <span class="player-name">${match.playerB.name}</span>
+        </div>
+        <div class="score-grid">
+          ${match.score.playerB.map((s,i) => scoreCell(s, isAdmin, match.id, 'playerB', i)).join('')}
+        </div>
+      </div>`;
+
+    const winnerSelect = isAdmin ? `
+      <div class="winner-select-row">
+        <select class="form-input winner-select-input" onchange="setMatchWinner('${match.id}', this.value)">
+          <option value="">— Zwycięzca —</option>
+          <option value="playerA" ${match.winner==='playerA'?'selected':''}>✓ ${match.playerA.name}</option>
+          <option value="playerB" ${match.winner==='playerB'?'selected':''}>✓ ${match.playerB.name}</option>
+        </select>
+      </div>` : '';
+
     return `
-      <div class="b-match">
-        <div class="b-player ${p1w ? 'winner-player' : ''}">
-          <span class="b-player-name">${match.p1}</span>
-          <span class="b-player-score">${match.s1}</span>
-        </div>
-        <div class="b-player ${p2w ? 'winner-player' : ''}">
-          <span class="b-player-name">${match.p2}</span>
-          <span class="b-player-score">${match.s2}</span>
-        </div>
+      <div class="b-match is-${match.status}" data-match-id="${match.id}">
+        ${rowA}
+        <div class="match-divider"></div>
+        ${rowB}
+        ${winnerSelect}
       </div>`;
   };
 
+  const connColor = 'rgba(108,192,48,0.35)';
   const connSVG1 = `
     <svg viewBox="0 0 ${cw} ${h}" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-      <line x1="0" y1="${r1[0]}" x2="${cw/2}" y2="${r1[0]}" stroke="#CBD3DC" stroke-width="1.5"/>
-      <line x1="0" y1="${r1[1]}" x2="${cw/2}" y2="${r1[1]}" stroke="#CBD3DC" stroke-width="1.5"/>
-      <line x1="${cw/2}" y1="${r1[0]}" x2="${cw/2}" y2="${r1[1]}" stroke="#CBD3DC" stroke-width="1.5"/>
-      <line x1="${cw/2}" y1="${r2[0]}" x2="${cw}" y2="${r2[0]}" stroke="#CBD3DC" stroke-width="1.5"/>
-      <line x1="0" y1="${r1[2]}" x2="${cw/2}" y2="${r1[2]}" stroke="#CBD3DC" stroke-width="1.5"/>
-      <line x1="0" y1="${r1[3]}" x2="${cw/2}" y2="${r1[3]}" stroke="#CBD3DC" stroke-width="1.5"/>
-      <line x1="${cw/2}" y1="${r1[2]}" x2="${cw/2}" y2="${r1[3]}" stroke="#CBD3DC" stroke-width="1.5"/>
-      <line x1="${cw/2}" y1="${r2[1]}" x2="${cw}" y2="${r2[1]}" stroke="#CBD3DC" stroke-width="1.5"/>
+      <line x1="0" y1="${r1[0]}" x2="${cw/2}" y2="${r1[0]}" stroke="${connColor}" stroke-width="1.5"/>
+      <line x1="0" y1="${r1[1]}" x2="${cw/2}" y2="${r1[1]}" stroke="${connColor}" stroke-width="1.5"/>
+      <line x1="${cw/2}" y1="${r1[0]}" x2="${cw/2}" y2="${r1[1]}" stroke="${connColor}" stroke-width="1.5"/>
+      <line x1="${cw/2}" y1="${r2[0]}" x2="${cw}" y2="${r2[0]}" stroke="${connColor}" stroke-width="1.5"/>
+      <line x1="0" y1="${r1[2]}" x2="${cw/2}" y2="${r1[2]}" stroke="${connColor}" stroke-width="1.5"/>
+      <line x1="0" y1="${r1[3]}" x2="${cw/2}" y2="${r1[3]}" stroke="${connColor}" stroke-width="1.5"/>
+      <line x1="${cw/2}" y1="${r1[2]}" x2="${cw/2}" y2="${r1[3]}" stroke="${connColor}" stroke-width="1.5"/>
+      <line x1="${cw/2}" y1="${r2[1]}" x2="${cw}" y2="${r2[1]}" stroke="${connColor}" stroke-width="1.5"/>
     </svg>`;
 
   const connSVG2 = `
     <svg viewBox="0 0 ${cw} ${h}" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-      <line x1="0" y1="${r2[0]}" x2="${cw/2}" y2="${r2[0]}" stroke="#CBD3DC" stroke-width="1.5"/>
-      <line x1="0" y1="${r2[1]}" x2="${cw/2}" y2="${r2[1]}" stroke="#CBD3DC" stroke-width="1.5"/>
-      <line x1="${cw/2}" y1="${r2[0]}" x2="${cw/2}" y2="${r2[1]}" stroke="#CBD3DC" stroke-width="1.5"/>
-      <line x1="${cw/2}" y1="${r3}" x2="${cw}" y2="${r3}" stroke="#CBD3DC" stroke-width="1.5"/>
+      <line x1="0" y1="${r2[0]}" x2="${cw/2}" y2="${r2[0]}" stroke="${connColor}" stroke-width="1.5"/>
+      <line x1="0" y1="${r2[1]}" x2="${cw/2}" y2="${r2[1]}" stroke="${connColor}" stroke-width="1.5"/>
+      <line x1="${cw/2}" y1="${r2[0]}" x2="${cw/2}" y2="${r2[1]}" stroke="${connColor}" stroke-width="1.5"/>
+      <line x1="${cw/2}" y1="${r3}" x2="${cw}" y2="${r3}" stroke="${connColor}" stroke-width="1.5"/>
     </svg>`;
 
   return `
-    <!-- R1 -->
     <div class="bracket-round" style="width:${mw}px;height:${h}px">
-      ${bData.r1.map(match => matchCard(match)).join('')}
+      ${bData.r1.map(m => matchCard(m)).join('')}
     </div>
-    <!-- Connector 1 -->
     <div class="bracket-connector" style="width:${cw}px;height:${h}px">${connSVG1}</div>
-    <!-- R2 SF -->
     <div class="bracket-round" style="width:${mw}px;height:${h}px">
-      ${bData.sf.map(match => matchCard(match)).join('')}
+      ${bData.sf.map(m => matchCard(m)).join('')}
     </div>
-    <!-- Connector 2 -->
     <div class="bracket-connector" style="width:${cw}px;height:${h}px">${connSVG2}</div>
-    <!-- R3 Final -->
     <div class="bracket-round" style="width:${mw}px;height:${h}px">
       ${matchCard(bData.final)}
     </div>
-    <!-- Winner -->
     <div class="bracket-winner-box">
       <div class="winner-trophy">🏆</div>
       <div class="winner-label">Zwycięzca</div>
       <div class="winner-name">${bData.winner}</div>
     </div>`;
+}
+
+// Znajdź mecz po ID we wszystkich drabinkach
+function findMatchById(matchId) {
+  const brackets = [womenDoublesBracket, menSinglesBracket, mixedOpenBracket];
+  // Also search in tournament categories
+  state.tournaments.forEach(t => t.categories.forEach(c => {
+    if (c.bracket) brackets.push(c.bracket);
+  }));
+  for (const b of brackets) {
+    const allMatches = [...(b.r1||[]), ...(b.sf||[]), b.final].filter(Boolean);
+    const found = allMatches.find(m => m.id === matchId);
+    if (found) return found;
+  }
+  return null;
+}
+
+function updateMatchScore(input) {
+  const matchId = input.dataset.match;
+  const side    = input.dataset.side;   // 'playerA' | 'playerB'
+  const setIdx  = parseInt(input.dataset.set);
+  const isTb    = !!input.dataset.tb;
+  const val     = input.value === '' ? null : parseInt(input.value);
+
+  const match = findMatchById(matchId);
+  if (!match) return;
+
+  if (isTb) {
+    match.score[side][setIdx].tiebreak = val;
+  } else {
+    match.score[side][setIdx].games = val;
+  }
+  match.status = 'finished';
+  showToast('Wynik meczu został zaktualizowany');
+}
+
+function setMatchWinner(matchId, winner) {
+  const match = findMatchById(matchId);
+  if (!match) return;
+  match.winner = winner || null;
+  showToast('Zwycięzca meczu został zapisany');
+  // Re-render current bracket if visible
+  const bracketArea = document.getElementById('bracket-scroll');
+  if (bracketArea && !bracketArea.closest('.hidden')) {
+    const catId = state.selectedCategoryId;
+    const tournament = state.tournaments.find(t => t.id === state.selectedTournamentId);
+    const cat = tournament?.categories.find(c => c.id === catId);
+    if (cat?.bracket) {
+      bracketArea.innerHTML = buildBracketHTML(cat.bracket, false, false);
+    }
+  }
 }
 
 /* =============================================

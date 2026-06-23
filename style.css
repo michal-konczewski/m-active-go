@@ -1265,57 +1265,205 @@ textarea.form-input { resize: vertical; min-height: 100px; }
 .brl-item.conn { width: 60px; }
 .brl-item.winner { flex: 1; min-width: 160px; }
 
-/* Match card in bracket */
+/* =============================================
+   BRACKET — Match Card (WTA-style scores)
+   ============================================= */
+
 .b-match {
   background: var(--glass);
   backdrop-filter: var(--glass-blur);
   -webkit-backdrop-filter: var(--glass-blur);
   border: 1.5px solid var(--glass-border);
-  border-radius: 8px;
+  border-radius: 10px;
   overflow: hidden;
   flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
 }
 
-.b-player {
+.b-match.is-pending { opacity: 0.7; }
+
+.match-divider {
+  height: 1px;
+  background: var(--border);
+}
+
+.match-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 10px;
+  transition: background 0.15s;
+}
+
+.match-row.is-winner {
+  background: rgba(108,192,48,0.13);
+}
+
+body.dark .match-row.is-winner {
+  background: rgba(108,192,48,0.18);
+}
+
+.player-info {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 8px 12px;
-  font-size: 12.5px;
-  gap: 8px;
-}
-
-.b-player + .b-player {
-  border-top: 1px solid var(--border);
-}
-
-.b-player-name {
-  flex: 1;
+  gap: 4px;
   min-width: 0;
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  font-weight: 500;
 }
 
-.b-player-score {
-  font-size: 12px;
+.winner-badge {
+  flex-shrink: 0;
+  font-size: 9px;
+  font-weight: 800;
+  background: var(--accent);
+  color: #fff;
+  border-radius: 999px;
+  padding: 2px 5px;
+  line-height: 1.2;
+  letter-spacing: 0.3px;
+}
+
+.winner-badge-placeholder {
+  flex-shrink: 0;
+  width: 21px;
+}
+
+.player-seed {
+  flex-shrink: 0;
+  font-size: 10px;
   font-weight: 700;
-  color: var(--text-muted);
+  color: var(--accent-dark);
+  background: var(--accent-light);
+  border-radius: 4px;
+  padding: 1px 5px;
+  line-height: 1.4;
+}
+
+.player-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+
+.match-row.is-winner .player-name {
+  font-weight: 700;
+  color: var(--accent-dark);
+}
+
+body.dark .match-row.is-winner .player-name {
+  color: var(--accent);
+}
+
+/* Score columns */
+.score-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 28px);
+  gap: 3px;
   flex-shrink: 0;
 }
 
-.b-player.winner-player {
-  background: var(--accent-light);
-}
-
-.b-player.winner-player .b-player-name {
-  color: var(--accent-dark);
+.score-cell {
+  text-align: center;
+  font-size: 13px;
   font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  padding: 2px 0;
 }
 
-.b-player.winner-player .b-player-score {
-  color: var(--accent-dark);
+.score-cell.muted {
+  color: var(--text-light);
+  font-weight: 400;
+}
+
+.score-cell sup {
+  font-size: 8px;
+  line-height: 0;
+  margin-left: 1px;
+  font-weight: 600;
+}
+
+/* Admin score inputs */
+.score-cell-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+}
+
+.score-input {
+  width: 26px;
+  height: 24px;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 700;
+  border: 1px solid var(--border-strong);
+  border-radius: 4px;
+  background: rgba(255,255,255,0.5);
+  color: var(--text);
+  padding: 0;
+  -moz-appearance: textfield;
+}
+
+.score-input::-webkit-outer-spin-button,
+.score-input::-webkit-inner-spin-button { -webkit-appearance: none; }
+
+.tb-input {
+  width: 26px;
+  height: 16px;
+  text-align: center;
+  font-size: 9px;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  background: rgba(255,255,255,0.3);
+  color: var(--text-muted);
+  padding: 0;
+  -moz-appearance: textfield;
+}
+
+.tb-input::-webkit-outer-spin-button,
+.tb-input::-webkit-inner-spin-button { -webkit-appearance: none; }
+
+.winner-select-row {
+  padding: 5px 8px;
+  border-top: 1px solid var(--border);
+  background: rgba(0,0,0,0.03);
+}
+
+.winner-select-input {
+  font-size: 11px;
+  padding: 4px 8px;
+  height: auto;
+}
+
+/* Score column headers above bracket */
+.bracket-score-header {
+  display: flex;
+  justify-content: flex-end;
+  gap: 3px;
+  padding-right: 10px;
+  margin-bottom: 4px;
+}
+
+.bracket-score-header span {
+  width: 28px;
+  text-align: center;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: var(--text-muted);
+}
+
+/* Wider bracket container for new match cards */
+.bracket-scroll {
+  min-width: 1000px;
 }
 
 /* Winner box */
