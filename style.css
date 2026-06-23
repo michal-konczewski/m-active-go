@@ -1704,6 +1704,18 @@ body.dark .match-row.is-winner .player-name {
   align-items: stretch;
   gap: 0;
   overflow: auto;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.pdf-bracket .bracket-flex {
+  width: 100%;
+  min-width: 0;
+}
+
+.pdf-bracket .bracket-round {
+  min-width: 0;
+  flex: 1;
 }
 
 .pdf-bracket .b-match {
@@ -1715,12 +1727,15 @@ body.dark .match-row.is-winner .player-name {
   width: 1060px;
   min-height: 750px;
   max-width: none;
-  padding: 36px 52px;
+  padding: 32px 44px;
   box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
 }
 
 .pdf-page-landscape .pdf-bracket {
   flex: 1;
+  overflow: hidden;
 }
 
 /* Public info pages */
@@ -1890,30 +1905,142 @@ body.dark .match-row.is-winner .player-name {
    @media print
    ============================================= */
 
-@page { size: A4 portrait; margin: 0; }
-@page landscape-page { size: A4 landscape; margin: 0; }
+/* Default: landscape for brackets, portrait for cover */
+@page { size: A4 landscape; margin: 8mm; }
+@page portrait-page { size: A4 portrait; margin: 12mm; }
 
 @media print {
   #view-toggle, #admin-view { display: none !important; }
   #public-view { display: none !important; }
   .pdf-modal-overlay { position: static !important; background: none !important; }
   .pdf-topbar { display: none !important; }
-  .pdf-pages { max-width: 100% !important; gap: 0 !important; }
+  .pdf-pages { max-width: 100% !important; gap: 0 !important; padding: 0 !important; }
+
+  /* Cover page — portrait A4 */
   .pdf-page {
     box-shadow: none !important;
+    border: none !important;
     border-radius: 0 !important;
     page-break-after: always;
     break-after: page;
     margin: 0 !important;
-    padding: 40px 60px !important;
+    padding: 32px 40px !important;
     min-height: auto !important;
+    width: 210mm !important;
+    box-sizing: border-box !important;
     page: portrait-page;
   }
+
+  /* Bracket pages — landscape A4 */
   .pdf-page-landscape {
-    page: landscape-page;
-    padding: 30px 50px !important;
+    page: auto;
+    width: 277mm !important;       /* A4 landscape 297mm minus 2×8mm margin */
+    min-height: 190mm !important;
+    max-width: none !important;
+    padding: 10mm 12mm !important;
+    box-sizing: border-box !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
   }
+
   .pdf-page:last-child { page-break-after: auto; break-after: auto; }
+
+  /* Bracket layout — fit to page width */
+  .pdf-bracket {
+    flex: 1;
+    overflow: hidden !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .pdf-bracket .bracket-flex {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  /* Rounds fill available width equally */
+  .pdf-bracket .bracket-round {
+    flex: 1 !important;
+    min-width: 0 !important;
+    max-width: none !important;
+  }
+
+  /* Narrow connector lines */
+  .pdf-bracket .bracket-conn {
+    width: 20px !important;
+    flex-shrink: 0 !important;
+  }
+
+  /* Compact match cards */
+  .pdf-bracket .b-match {
+    border-radius: 4px !important;
+    border-color: #C5BFB5 !important;
+  }
+
+  .pdf-bracket .match-row {
+    padding: 4px 6px !important;
+    min-height: 20px !important;
+    gap: 4px !important;
+  }
+
+  .pdf-bracket .player-name {
+    font-size: 7.5pt !important;
+    line-height: 1.15 !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .pdf-bracket .player-seed {
+    font-size: 6.5pt !important;
+    padding: 1px 3px !important;
+  }
+
+  .pdf-bracket .winner-badge {
+    font-size: 6pt !important;
+    padding: 1px 3px !important;
+  }
+
+  .pdf-bracket .winner-badge-placeholder {
+    width: 14px !important;
+  }
+
+  .pdf-bracket .score-grid {
+    grid-template-columns: repeat(3, 16px) !important;
+    gap: 1px !important;
+  }
+
+  .pdf-bracket .score-cell {
+    font-size: 7.5pt !important;
+    padding: 1px 0 !important;
+  }
+
+  .pdf-bracket .score-cell sup {
+    font-size: 5pt !important;
+  }
+
+  /* PDF header — compact */
+  .pdf-header {
+    margin-bottom: 8mm !important;
+    padding-bottom: 4mm !important;
+  }
+
+  .pdf-logo-mark {
+    width: 32px !important;
+    height: 32px !important;
+  }
+
+  .pdf-brand { font-size: 15pt !important; }
+  .pdf-brand-sub { font-size: 8pt !important; }
+
+  .pdf-page h1 { font-size: 16pt !important; margin-bottom: 2mm !important; }
+  .pdf-page h2 { font-size: 11pt !important; }
+
+  .pdf-subtitle { font-size: 8pt !important; margin-bottom: 5mm !important; }
+
+  /* Round labels */
+  #bracket-round-labels { display: none !important; }
 }
 
 /* =============================================
