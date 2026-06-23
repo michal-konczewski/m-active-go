@@ -1475,6 +1475,53 @@ body.dark .match-row.is-winner .player-name {
   white-space: nowrap;
 }
 
+.bracket-results {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.result-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 13px;
+}
+
+.result-1 {
+  background: rgba(242,106,33,0.10);
+  font-weight: 600;
+}
+
+.result-2 {
+  background: var(--surface-alt);
+}
+
+.result-3 {
+  background: var(--surface-alt);
+}
+
+.result-place {
+  font-weight: 700;
+  font-size: 12px;
+  min-width: 20px;
+  color: var(--accent);
+}
+
+.result-2 .result-place,
+.result-3 .result-place {
+  color: var(--color-text-muted);
+}
+
+.result-name {
+  color: var(--color-text);
+}
+
 /* =============================================
    BRACKET — Compact (32-player)
    ============================================= */

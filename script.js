@@ -1316,7 +1316,21 @@ function buildBracketHTML(bData, compact, adminMode, isBlank) {
     ? `<div class="bracket-third-place"><span class="bracket-third-label">Mecz o 3. miejsce</span>${matchCard(bData.third)}</div>`
     : '';
 
-  return `<div class="bracket-flex${compact ? ' bracket-compact' : ''}">${renderRounds()}</div>${thirdHtml}`;
+  const resultsHtml = (() => {
+    const fin = bData.final;
+    if (!fin || !fin.winner) return '';
+    const first = fin.winner === 'playerA' ? fin.playerA.name : fin.playerB.name;
+    const second = fin.winner === 'playerA' ? fin.playerB.name : fin.playerA.name;
+    let rows = `<div class="result-row result-1"><span class="result-place">1.</span><span class="result-name">${first}</span></div>`;
+    rows += `<div class="result-row result-2"><span class="result-place">2.</span><span class="result-name">${second}</span></div>`;
+    if (bData.third && bData.third.winner) {
+      const third = bData.third.winner === 'playerA' ? bData.third.playerA.name : bData.third.playerB.name;
+      rows += `<div class="result-row result-3"><span class="result-place">3.</span><span class="result-name">${third}</span></div>`;
+    }
+    return `<div class="bracket-results">${rows}</div>`;
+  })();
+
+  return `<div class="bracket-flex${compact ? ' bracket-compact' : ''}">${renderRounds()}</div>${thirdHtml}${resultsHtml}`;
 }
 
 // Znajdź mecz po ID we wszystkich drabinkach
