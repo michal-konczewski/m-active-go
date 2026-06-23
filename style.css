@@ -1454,6 +1454,28 @@ body.dark .match-row.is-winner .player-name {
 .brl-item.conn { width: 28px; flex-shrink: 0; }
 
 /* =============================================
+   BRACKET — Third place match
+   ============================================= */
+
+.bracket-third-place {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid var(--color-border);
+}
+
+.bracket-third-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+/* =============================================
    BRACKET — Compact (32-player)
    ============================================= */
 
