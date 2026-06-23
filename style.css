@@ -2302,3 +2302,160 @@ body.dark .badge-drawn { color: #60A5FA; }
   padding: 16px;
   margin-bottom: 16px;
 }
+
+/* =============================================
+   Badge extras
+   ============================================= */
+.badge-archived {
+  background: rgba(107,114,128,0.12);
+  color: #4B5563;
+  border: 1px solid rgba(107,114,128,0.25);
+}
+body.dark .badge-archived { color: #9CA3AF; }
+
+.badge-imported {
+  background: rgba(16,185,129,0.12);
+  color: #059669;
+  border: 1px solid rgba(16,185,129,0.25);
+}
+body.dark .badge-imported { color: #34D399; }
+
+/* =============================================
+   Filter tabs (tournament list)
+   ============================================= */
+.filter-tabs {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+  padding: 4px;
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  width: fit-content;
+}
+.filter-tab {
+  background: none;
+  border: none;
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-muted);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 120ms, color 120ms;
+  white-space: nowrap;
+}
+.filter-tab:hover { background: var(--bg); color: var(--text); }
+.filter-tab.active { background: var(--surface); color: var(--accent); font-weight: 600; box-shadow: var(--shadow-sm); }
+
+/* Public toggle in tournament list */
+.pub-toggle {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--text-muted);
+  padding: 4px 8px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  transition: border-color 120ms;
+}
+.pub-toggle:hover { border-color: var(--accent); }
+.pub-toggle input { accent-color: var(--accent); }
+
+/* =============================================
+   Migration Module
+   ============================================= */
+.mig-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-bottom: 28px;
+}
+.mig-status-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 18px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 14px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.mig-status-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+  flex-shrink: 0;
+}
+.mig-status-idle      { background: var(--text-muted); }
+.mig-status-loaded    { background: #3B82F6; box-shadow: 0 0 6px rgba(59,130,246,0.5); }
+.mig-status-importing { background: var(--accent); box-shadow: 0 0 6px rgba(242,106,33,0.5); animation: pulse 1s infinite; }
+.mig-status-done      { background: #10B981; box-shadow: 0 0 6px rgba(16,185,129,0.5); }
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.4; }
+}
+
+.mig-upload-zone {
+  border: 2px dashed var(--border-strong);
+  border-radius: var(--radius-lg);
+  padding: 40px 24px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 160ms, background 160ms;
+  color: var(--text-muted);
+}
+.mig-upload-zone:hover {
+  border-color: var(--accent);
+  background: var(--accent-light);
+  color: var(--text);
+}
+
+/* Migration field status badges */
+.mig-field-badge {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+.mig-ok       { background: rgba(16,185,129,0.12); color: #059669; }
+.mig-review   { background: rgba(245,158,11,0.14); color: #D97706; }
+.mig-optional { background: rgba(107,114,128,0.12); color: #6B7280; }
+.mig-missing  { background: rgba(239,68,68,0.12); color: #DC2626; }
+.mig-conflict { background: rgba(239,68,68,0.12); color: #DC2626; }
+.mig-imported { background: rgba(16,185,129,0.12); color: #059669; }
+
+body.dark .mig-ok       { color: #34D399; }
+body.dark .mig-review   { color: #FCD34D; }
+body.dark .mig-imported { color: #34D399; }
+
+/* Migration tournament row */
+.mig-row-imported td { opacity: 0.55; }
+
+/* Conflicts panel */
+.mig-conflicts-panel {
+  border-left: 3px solid var(--accent) !important;
+}
+.mig-conflict-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+.mig-conflict-row:last-child { border-bottom: none; }
+.mig-conflict-info { flex: 1; min-width: 240px; }

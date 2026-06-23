@@ -242,6 +242,7 @@ function routeCurrentHash() {
     else if (sub === 'edit' && parts[2]) { state.editingTournamentId = parseInt(parts[2]); _showSection('edit-tournament', true); }
     else if (sub === 'organizer') _showSection('organizer', true);
     else if (sub === 'settings') _showSection('settings', true);
+    else if (sub === 'migration') _showSection('migration', true);
     else _showSection('dashboard', true);
   }
 }
@@ -310,6 +311,7 @@ const sectionTitles = {
   'add-tournament':    'Dodaj turniej',
   'edit-tournament':   'Edytuj turniej',
   settings:            'Ustawienia',
+  migration:           'Migracja danych',
   'tournament-detail': 'Turniej',
   'category-detail':   'Kategoria'
 };
@@ -325,6 +327,7 @@ function _showSection(name, skipHistory) {
   document.getElementById('topbar-title').textContent = sectionTitles[name] || name;
   if (name === 'dashboard') renderDashboard();
   if (name === 'tournaments') renderAdminTournamentList();
+  if (name === 'migration') renderMigrationSection();
   renderAdminBreadcrumb(name);
 }
 
@@ -336,6 +339,7 @@ function showSection(name) {
     tournaments: 'admin/tournaments',
     'add-tournament': 'admin/add-tournament',
     settings: 'admin/settings',
+    migration: 'admin/migration',
   };
   if (name === 'edit-tournament' && state.editingTournamentId) {
     navigate('admin/edit/' + state.editingTournamentId);
@@ -365,6 +369,7 @@ function renderAdminBreadcrumb(section, t) {
     'add-tournament': [['Dashboard', 'admin'], ['Turnieje', 'admin/tournaments'], ['Dodaj turniej', null]],
     'edit-tournament':[['Dashboard', 'admin'], ['Turnieje', 'admin/tournaments'], ['Edytuj turniej', null]],
     settings:         [['Dashboard', 'admin'], ['Ustawienia', null]],
+    migration:        [['Dashboard', 'admin'], ['Migracja danych', null]],
     'tournament-detail': [['Dashboard', 'admin'], ['Turnieje', 'admin/tournaments'], ['Turniej', null]],
     'category-detail':   [['Dashboard', 'admin'], ['Turnieje', 'admin/tournaments'], ['Turniej', null], ['Kategoria', null]],
   };
@@ -431,13 +436,42 @@ function renderDashboardTournamentList() {
    ADMIN — Tournament List
    ============================================= */
 
+let _tournamentFilter = 'all';
+
+function setTournamentFilter(f) {
+  _tournamentFilter = f;
+  document.querySelectorAll('.filter-tab').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.filter === f);
+  });
+  renderAdminTournamentList();
+}
+
 function renderAdminTournamentList() {
+  let list = state.tournaments;
+  if (_tournamentFilter === 'planned')  list = list.filter(t => t.status === 'planned');
+  else if (_tournamentFilter === 'active')   list = list.filter(t => t.status === 'active');
+  else if (_tournamentFilter === 'finished') list = list.filter(t => t.status === 'finished');
+  else if (_tournamentFilter === 'archived') list = list.filter(t => t.status === 'archived');
+  else if (_tournamentFilter === 'teniqo')   list = list.filter(t => t.source === 'teniqo');
+
   const tbody = document.getElementById('admin-tournament-tbody');
-  tbody.innerHTML = state.tournaments.map(t => `
+  if (!list.length) {
+    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:32px;color:var(--text-muted)">Brak turniejów spełniających kryteria filtra</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = list.map(t => {
+    const sourceBadge = t.source === 'teniqo'
+      ? `<span class="badge badge-imported" style="font-size:10px;margin-left:6px">z TENIQO</span>` : '';
+    const publicToggle = `<label class="pub-toggle" title="Widoczny publicznie">
+      <input type="checkbox" ${t.isPublic !== false ? 'checked' : ''} onchange="togglePublicVisibility(${t.id}, this.checked)">
+      <span>🌐</span></label>`;
+    return `
     <tr>
       <td>
-        <div class="t-name">${t.name}</div>
-        <div class="t-sub">${t.shortDesc.substring(0, 60)}…</div>
+        <div class="t-name">${t.name}${sourceBadge}</div>
+        <div class="t-sub">${(t.shortDesc||'').substring(0, 60)}…</div>
+        ${t.source === 'teniqo' ? `<div style="font-size:11px;color:var(--text-muted);margin-top:2px">Źródło: TENIQO · ID: ${t.teniqoId || '—'}</div>` : ''}
       </td>
       <td style="white-space:nowrap;font-size:13px">${formatDate(t.dateStart)}<br><span style="color:var(--text-muted)">do ${formatDate(t.dateEnd)}</span></td>
       <td style="font-size:13px;color:var(--text-muted)">${t.location}</td>
@@ -445,13 +479,23 @@ function renderAdminTournamentList() {
       <td>${badgeHtml(t.status)}</td>
       <td>
         <div class="t-actions">
+          ${publicToggle}
           <button class="btn btn-primary btn-sm" onclick="showTournamentDetail(${t.id})">📋 Szczegóły</button>
           <button class="btn btn-secondary btn-sm" onclick="editTournament(${t.id})">✏️ Edytuj</button>
           <button class="btn btn-ghost btn-sm" onclick="openPublicPreview(${t.id})">🌐 Podgląd</button>
           <button class="btn btn-ghost btn-sm" onclick="openPdfModal(${t.id})">📄 PDF</button>
         </div>
       </td>
-    </tr>`).join('');
+    </tr>`;
+  }).join('');
+}
+
+function togglePublicVisibility(tournamentId, isPublic) {
+  const t = state.tournaments.find(t => t.id === tournamentId);
+  if (t) {
+    t.isPublic = isPublic;
+    showToast(isPublic ? 'Turniej widoczny publicznie' : 'Turniej ukryty z widoku publicznego');
+  }
 }
 
 /* =============================================
@@ -1073,10 +1117,12 @@ function formatDate(dateStr) {
 
 function badgeHtml(status) {
   const map = {
-    active:   ['badge-active',   'Aktywny'],
-    planned:  ['badge-planned',  'Planowany'],
-    finished: ['badge-finished', 'Zakończony'],
-    drawn:    ['badge-drawn',    'Rozlosowana']
+    active:   ['badge-active',    'Aktywny'],
+    planned:  ['badge-planned',   'Planowany'],
+    finished: ['badge-finished',  'Zakończony'],
+    drawn:    ['badge-drawn',     'Rozlosowana'],
+    archived: ['badge-archived',  'Archiwalny'],
+    imported: ['badge-imported',  'Zaimportowany'],
   };
   const [cls, label] = map[status] || ['badge-finished','Nieznany'];
   return `<span class="badge ${cls}">${label}</span>`;
@@ -1701,6 +1747,424 @@ function shuffle(arr) {
     [arr[i], arr[j]] = [arr[j], arr[i]];
   }
   return arr;
+}
+
+/* =============================================
+   MIGRATION MODULE — Teniqo → M-ACTIVE GO
+   TODO: W finalnym wdrożeniu migracja będzie wymagała eksportu danych z TENIQO
+   lub dostępu do danych źródłowych za zgodą organizatora. Obecny prototyp pokazuje
+   proces importu i mapowania danych, ale nie łączy się z realnym systemem TENIQO.
+   ============================================= */
+
+const migrationState = {
+  status: 'idle',       // idle | loaded | importing | done
+  loaded: false,
+  pendingTournaments: [],
+  importedCount: 0,
+  conflictsCount: 0,
+  selectedIds: new Set(),
+};
+
+const mockTeniqoTournaments = [
+  {
+    _tid: 'tq-001',
+    teniqoId: 'T2025-001',
+    name: 'M-ACTIVE Summer Cup 2025',
+    shortDesc: 'Coroczny letni turniej tenisowy dla zawodników amatorskich w Warszawie.',
+    dateStart: '2025-07-05',
+    dateEnd:   '2025-07-06',
+    location:  'Kortex Tenis Club, Warszawa',
+    organizer: 'M-ACTIVE',
+    status: 'finished',
+    isPublic: true,
+    importStatus: 'ready',
+    issues: [],
+    matchCount: 14,
+    resultsCount: 14,
+    categories: [
+      { id: 'tq-c1', name: 'Debel kobiety open',     players: 8,  type: 'Drabinka', status: 'finished', categoryType: 'debel',   gender: 'kobiety',    level: 'open', limit: 8, format: 'elimination', seedsCount: 2, participants: [], bracket: null },
+      { id: 'tq-c2', name: 'Singiel mężczyźni open', players: 8,  type: 'Drabinka', status: 'finished', categoryType: 'singiel', gender: 'mezczyzni',  level: 'open', limit: 8, format: 'elimination', seedsCount: 2, participants: [], bracket: null },
+      { id: 'tq-c3', name: 'Mikst open',              players: 6,  type: 'Drabinka', status: 'finished', categoryType: 'mikst',   gender: 'open',       level: 'open', limit: 8, format: 'elimination', seedsCount: 2, participants: [], bracket: null },
+    ],
+  },
+  {
+    _tid: 'tq-002',
+    teniqoId: 'T2025-002',
+    name: 'M-ACTIVE Winter Cup 2025',
+    shortDesc: 'Zimowy turniej halowy — kategorie singlowe i deblowe na krytych kortach.',
+    dateStart: '2025-01-18',
+    dateEnd:   '2025-01-19',
+    location:  'Sport Park Wilanów, Warszawa',
+    organizer: 'M-ACTIVE',
+    status: 'finished',
+    isPublic: true,
+    importStatus: 'needs-review',
+    issues: [
+      { field: 'Wyniki setów', cat: 'Singiel mężczyźni open', problem: 'Wynik 7/6 bez małych punktów tie-breaka w meczu półfinałowym', action: 'Uzupełnij małe punkty tie-breaka' },
+      { field: 'Brak daty końca', cat: '—', problem: 'Turniej ma tylko datę startu — brak daty końca', action: 'Uzupełnij datę końca turnieju' },
+    ],
+    matchCount: 10,
+    resultsCount: 9,
+    categories: [
+      { id: 'tq-c4', name: 'Singiel mężczyźni open',  players: 8,  type: 'Drabinka', status: 'finished', categoryType: 'singiel', gender: 'mezczyzni', level: 'open', limit: 8, format: 'elimination', seedsCount: 2, participants: [], bracket: null },
+      { id: 'tq-c5', name: 'Debel mężczyźni open',    players: 8,  type: 'Drabinka', status: 'finished', categoryType: 'debel',   gender: 'mezczyzni', level: 'open', limit: 8, format: 'elimination', seedsCount: 2, participants: [], bracket: null },
+    ],
+  },
+  {
+    _tid: 'tq-003',
+    teniqoId: 'T2024-003',
+    name: 'M-ACTIVE Ladies Doubles 2024',
+    shortDesc: 'Turniej deblowy dedykowany zawodniczkom — dwie kategorie zaawansowania.',
+    dateStart: '2024-08-10',
+    dateEnd:   '2024-08-11',
+    location:  'Legia Tenis Club, Warszawa',
+    organizer: 'M-ACTIVE',
+    status: 'finished',
+    isPublic: true,
+    importStatus: 'ready',
+    issues: [],
+    matchCount: 7,
+    resultsCount: 7,
+    categories: [
+      { id: 'tq-c6', name: 'Debel kobiety open',      players: 8,  type: 'Drabinka', status: 'finished', categoryType: 'debel', gender: 'kobiety', level: 'open',       limit: 8, format: 'elimination', seedsCount: 2, participants: [], bracket: null },
+      { id: 'tq-c7', name: 'Debel kobiety zaawansowane', players: 8, type: 'Drabinka', status: 'finished', categoryType: 'debel', gender: 'kobiety', level: 'zaawansowany', limit: 8, format: 'elimination', seedsCount: 2, participants: [], bracket: null },
+    ],
+  },
+  {
+    _tid: 'tq-004',
+    teniqoId: 'T2024-001',
+    name: 'M-ACTIVE Open Weekend 2024',
+    shortDesc: 'Weekendowy maraton tenisowy — cztery kategorie, trzy dni rywalizacji.',
+    dateStart: '2024-05-11',
+    dateEnd:   '2024-05-13',
+    location:  'Legia Tenis Club, Warszawa',
+    organizer: 'M-ACTIVE',
+    status: 'finished',
+    isPublic: true,
+    importStatus: 'needs-review',
+    issues: [
+      { field: 'Rozstawienie', cat: 'Singiel mężczyźni open', problem: 'Dwóch zawodników z numerem rozstawienia #2', action: 'Popraw numery rozstawienia' },
+    ],
+    matchCount: 22,
+    resultsCount: 21,
+    categories: [
+      { id: 'tq-c8',  name: 'Singiel mężczyźni open', players: 12, type: 'Drabinka',       status: 'finished', categoryType: 'singiel', gender: 'mezczyzni', level: 'open', limit: 16, format: 'elimination', seedsCount: 4, participants: [], bracket: null },
+      { id: 'tq-c9',  name: 'Singiel kobiety open',   players: 8,  type: 'Drabinka',       status: 'finished', categoryType: 'singiel', gender: 'kobiety',   level: 'open', limit: 8,  format: 'elimination', seedsCount: 2, participants: [], bracket: null },
+      { id: 'tq-c10', name: 'Debel mieszany open',    players: 8,  type: 'Drabinka',       status: 'finished', categoryType: 'mikst',   gender: 'open',      level: 'open', limit: 8,  format: 'elimination', seedsCount: 2, participants: [], bracket: null },
+      { id: 'tq-c11', name: 'Turniej seniors 40+',    players: 6,  type: 'Każdy z każdym', status: 'finished', categoryType: 'singiel', gender: 'open',      level: 'open', limit: 8,  format: 'roundrobin',  seedsCount: 0, participants: [], bracket: null },
+    ],
+  },
+  {
+    _tid: 'tq-005',
+    teniqoId: 'T2023-001',
+    name: 'M-ACTIVE Club Championship 2023',
+    shortDesc: 'Pierwsze mistrzostwa klubowe M-ACTIVE — pięć kategorii dla wszystkich poziomów.',
+    dateStart: '2023-09-16',
+    dateEnd:   '2023-09-17',
+    location:  'Kortex Tenis Club, Warszawa',
+    organizer: 'M-ACTIVE',
+    status: 'finished',
+    isPublic: false,
+    importStatus: 'ready',
+    issues: [],
+    matchCount: 18,
+    resultsCount: 18,
+    categories: [
+      { id: 'tq-c12', name: 'Singiel mężczyźni open',    players: 8, type: 'Drabinka', status: 'finished', categoryType: 'singiel', gender: 'mezczyzni', level: 'open',          limit: 8, format: 'elimination', seedsCount: 2, participants: [], bracket: null },
+      { id: 'tq-c13', name: 'Singiel kobiety open',      players: 8, type: 'Drabinka', status: 'finished', categoryType: 'singiel', gender: 'kobiety',   level: 'open',          limit: 8, format: 'elimination', seedsCount: 2, participants: [], bracket: null },
+      { id: 'tq-c14', name: 'Debel mężczyźni open',      players: 8, type: 'Drabinka', status: 'finished', categoryType: 'debel',   gender: 'mezczyzni', level: 'open',          limit: 8, format: 'elimination', seedsCount: 2, participants: [], bracket: null },
+      { id: 'tq-c15', name: 'Singiel mężczyźni senior',  players: 6, type: 'Drabinka', status: 'finished', categoryType: 'singiel', gender: 'mezczyzni', level: 'zaawansowany',  limit: 8, format: 'elimination', seedsCount: 2, participants: [], bracket: null },
+      { id: 'tq-c16', name: 'Mikst open',                players: 4, type: 'Drabinka', status: 'finished', categoryType: 'mikst',   gender: 'open',      level: 'open',          limit: 8, format: 'elimination', seedsCount: 0, participants: [], bracket: null },
+    ],
+  },
+];
+
+const MAPPING_ROWS = [
+  { from: 'Nazwa turnieju',   to: 'Nazwa turnieju',    status: 'ok' },
+  { from: 'Data startu',      to: 'Data startu',        status: 'ok' },
+  { from: 'Data końca',       to: 'Data końca',         status: 'ok' },
+  { from: 'Lokalizacja',      to: 'Lokalizacja',        status: 'ok' },
+  { from: 'Kategorie',        to: 'Kategorie',          status: 'ok' },
+  { from: 'Zawodnicy / pary', to: 'Uczestnicy / pary',  status: 'ok' },
+  { from: 'Drabinka',         to: 'Drabinka single-elim', status: 'ok' },
+  { from: 'Wyniki meczów',    to: 'Wyniki setów',       status: 'review' },
+  { from: 'Tie-break',        to: 'Małe punkty (sup)',  status: 'review' },
+  { from: 'Pliki PDF',        to: 'Załączniki PDF',     status: 'optional' },
+  { from: 'Status turnieju',  to: 'Status turnieju',    status: 'ok' },
+  { from: 'ID TENIQO',        to: 'Pole referencyjne',  status: 'ok' },
+];
+
+function renderMigrationSection() {
+  const imported = state.tournaments.filter(t => t.source === 'teniqo').length;
+  const total    = migrationState.pendingTournaments.length;
+  const cats     = migrationState.pendingTournaments.reduce((s, t) => s + t.categories.length, 0);
+  const players  = migrationState.pendingTournaments.reduce((s, t) => s + t.categories.reduce((cs, c) => cs + (c.players || 0), 0), 0);
+  const matches  = migrationState.pendingTournaments.reduce((s, t) => s + (t.matchCount || 0), 0);
+  const results  = migrationState.pendingTournaments.reduce((s, t) => s + (t.resultsCount || 0), 0);
+  const conflicts= migrationState.pendingTournaments.reduce((s, t) => s + (t.issues ? t.issues.length : 0), 0);
+
+  const statusLabel = {
+    idle:      ['mig-status-idle',      'Nie rozpoczęto'],
+    loaded:    ['mig-status-loaded',    'Dane załadowane'],
+    importing: ['mig-status-importing', 'W trakcie importu'],
+    done:      ['mig-status-done',      'Zakończona'],
+  };
+  const [stCls, stLabel] = statusLabel[migrationState.status] || statusLabel.idle;
+
+  const container = document.getElementById('migration-content');
+  container.innerHTML = `
+    <div class="mig-header">
+      <div>
+        <h2 style="font-size:20px;font-weight:700;margin-bottom:6px">Migracja turniejów z TENIQO</h2>
+        <p style="color:var(--text-muted);font-size:13.5px;max-width:560px">
+          Przenieś dotychczasowe turnieje, kategorie, uczestników, drabinki i wyniki do M-ACTIVE GO.
+          System nie łączy się bezpośrednio z TENIQO — dane są wgrywane z pliku eksportu lub ładowane jako przykładowe.
+        </p>
+      </div>
+      <div class="mig-status-bar">
+        <span class="mig-status-dot ${stCls}"></span>
+        <span style="font-weight:600">${stLabel}</span>
+      </div>
+    </div>
+
+    <div class="stats-grid" style="margin-bottom:24px">
+      ${[
+        ['🔍', 'Znalezione turnieje', total || '—'],
+        ['✅', 'Zaimportowane', imported],
+        ['📋', 'Kategorie', cats || '—'],
+        ['👥', 'Uczestnicy/pary', players || '—'],
+        ['🎾', 'Mecze', matches || '—'],
+        ['📊', 'Wyniki', results || '—'],
+        ['⚠️', 'Wymagają weryfikacji', conflicts || '—'],
+      ].map(([icon, label, val]) => `
+        <div class="stat-card">
+          <div class="stat-icon">${icon}</div>
+          <div class="stat-label">${label}</div>
+          <div class="stat-value">${val}</div>
+        </div>`).join('')}
+    </div>
+
+    <!-- File Upload -->
+    <div class="form-panel" style="margin-bottom:24px">
+      <div class="form-panel-title">Wgraj eksport z TENIQO</div>
+      <p style="font-size:13px;color:var(--text-muted);margin-bottom:16px">
+        Wgraj plik eksportu zawierający turnieje, kategorie, uczestników, drabinki i wyniki.
+        Dane zostaną zmapowane do struktury M-ACTIVE GO.
+      </p>
+      <div class="mig-upload-zone" onclick="showToast('Upload — wybierz plik CSV, JSON lub XLSX')">
+        <div style="font-size:36px;margin-bottom:10px">📂</div>
+        <div style="font-weight:600;margin-bottom:4px">Przeciągnij plik lub kliknij, aby wybrać</div>
+        <div style="font-size:12px;color:var(--text-muted)">CSV · JSON · XLSX — maks. 10 MB</div>
+        <input type="file" accept=".csv,.json,.xlsx" style="display:none" onchange="showToast('Plik wybrany — przetwarzanie...')"/>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:16px;flex-wrap:wrap">
+        <button class="btn btn-primary" onclick="showToast('Wybierz plik eksportu z TENIQO')">📁 Wybierz plik</button>
+        <button class="btn btn-secondary" onclick="showToast('Sprawdzanie struktury danych...')">🔍 Sprawdź dane</button>
+        <button class="btn btn-ghost" onclick="loadMockMigrationData()">🎾 Załaduj przykładowe dane migracyjne</button>
+      </div>
+    </div>
+
+    <!-- Mapping table -->
+    <div class="form-panel" style="margin-bottom:24px">
+      <div class="form-panel-title">Mapowanie pól danych</div>
+      <table class="participants-table" style="min-width:500px">
+        <thead>
+          <tr>
+            <th>Pole w TENIQO</th>
+            <th>Pole w M-ACTIVE GO</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${MAPPING_ROWS.map(r => `
+            <tr>
+              <td>${r.from}</td>
+              <td>${r.to}</td>
+              <td>${mappingStatusBadge(r.status)}</td>
+            </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>
+
+    ${migrationState.loaded ? renderMigrationTournamentList() : ''}
+    ${migrationState.loaded && conflicts > 0 ? renderConflictsSection() : ''}
+  `;
+}
+
+function mappingStatusBadge(s) {
+  const map = {
+    ok:       '<span class="mig-field-badge mig-ok">OK</span>',
+    review:   '<span class="mig-field-badge mig-review">Do weryfikacji</span>',
+    optional: '<span class="mig-field-badge mig-optional">Opcjonalne</span>',
+    missing:  '<span class="mig-field-badge mig-missing">Brak danych</span>',
+    conflict: '<span class="mig-field-badge mig-conflict">Konflikt</span>',
+  };
+  return map[s] || map.ok;
+}
+
+function importStatusBadge(s) {
+  const map = {
+    ready:        '<span class="mig-field-badge mig-ok">Gotowy do importu</span>',
+    imported:     '<span class="mig-field-badge mig-imported">Zaimportowany</span>',
+    'needs-review': '<span class="mig-field-badge mig-review">Wymaga sprawdzenia</span>',
+    error:        '<span class="mig-field-badge mig-conflict">Błąd importu</span>',
+  };
+  return map[s] || map.ready;
+}
+
+function loadMockMigrationData() {
+  migrationState.pendingTournaments = mockTeniqoTournaments.map(t => ({ ...t }));
+  migrationState.loaded = true;
+  migrationState.status = 'loaded';
+  migrationState.selectedIds = new Set(mockTeniqoTournaments.map(t => t._tid));
+  showToast('Załadowano przykładowe dane z 5 turniejów TENIQO');
+  renderMigrationSection();
+}
+
+function toggleMigrationSelect(tid) {
+  if (migrationState.selectedIds.has(tid)) migrationState.selectedIds.delete(tid);
+  else migrationState.selectedIds.add(tid);
+  const row = document.querySelector(`[data-migration-id="${tid}"]`);
+  if (row) row.querySelector('input[type=checkbox]').checked = migrationState.selectedIds.has(tid);
+}
+
+function selectAllMigration() {
+  migrationState.pendingTournaments.forEach(t => migrationState.selectedIds.add(t._tid));
+  renderMigrationSection();
+}
+
+function skipArchivedMigration() {
+  migrationState.pendingTournaments
+    .filter(t => t.status === 'finished')
+    .forEach(t => migrationState.selectedIds.delete(t._tid));
+  renderMigrationSection();
+}
+
+function importSelectedTournaments() {
+  const toImport = migrationState.pendingTournaments.filter(t => migrationState.selectedIds.has(t._tid));
+  if (!toImport.length) { showToast('Zaznacz turnieje do importu'); return; }
+
+  migrationState.status = 'importing';
+  renderMigrationSection();
+
+  setTimeout(() => {
+    const today = new Date().toISOString().split('T')[0];
+    let nextId = Math.max(0, ...state.tournaments.map(t => typeof t.id === 'number' ? t.id : 0)) + 100;
+
+    toImport.forEach(tq => {
+      if (state.tournaments.find(t => t.teniqoId === tq.teniqoId)) return;
+      state.tournaments.push({
+        id: ++nextId,
+        teniqoId: tq.teniqoId,
+        name: tq.name,
+        shortDesc: tq.shortDesc,
+        dateStart: tq.dateStart,
+        dateEnd:   tq.dateEnd,
+        location:  tq.location,
+        organizer: tq.organizer,
+        status:    tq.status,
+        source:    'teniqo',
+        importedAt: today,
+        isPublic:  tq.isPublic,
+        categories: tq.categories.map(c => ({ ...c, id: parseInt(c.id.replace('tq-c', '')) + 500, participants: [], bracket: null })),
+      });
+      tq.importStatus = 'imported';
+    });
+
+    migrationState.importedCount += toImport.length;
+    migrationState.status = 'done';
+    showToast(`Zaimportowano ${toImport.length} turniejów z TENIQO`);
+    renderMigrationSection();
+  }, 900);
+}
+
+function renderMigrationTournamentList() {
+  const list = migrationState.pendingTournaments;
+  return `
+    <div class="form-panel" style="margin-bottom:24px">
+      <div class="form-panel-title" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+        <span>Turnieje do przeniesienia (${list.length})</span>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn btn-ghost btn-sm" onclick="selectAllMigration()">Zaznacz wszystkie</button>
+          <button class="btn btn-ghost btn-sm" onclick="skipArchivedMigration()">Pomiń archiwalne</button>
+          <button class="btn btn-primary btn-sm" onclick="importSelectedTournaments()">📥 Importuj wybrane</button>
+        </div>
+      </div>
+      <div class="participants-table-wrap">
+        <table class="participants-table">
+          <thead>
+            <tr>
+              <th style="width:36px"></th>
+              <th>Turniej</th>
+              <th>Data</th>
+              <th>Kategorie</th>
+              <th>Mecze / wyniki</th>
+              <th>Status importu</th>
+              <th>Akcje</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${list.map(t => {
+              const isSelected = migrationState.selectedIds.has(t._tid);
+              const alreadyImported = t.importStatus === 'imported';
+              return `
+                <tr data-migration-id="${t._tid}" class="${alreadyImported ? 'mig-row-imported' : ''}">
+                  <td><input type="checkbox" ${isSelected ? 'checked' : ''} ${alreadyImported ? 'disabled' : ''} onchange="toggleMigrationSelect('${t._tid}')"/></td>
+                  <td>
+                    <div style="font-weight:600">${t.name}</div>
+                    <div style="font-size:11px;color:var(--text-muted)">${t.location} · ID: ${t.teniqoId}</div>
+                    ${t.issues && t.issues.length ? `<span style="font-size:11px;color:var(--accent)">⚠️ ${t.issues.length} do weryfikacji</span>` : ''}
+                  </td>
+                  <td style="font-size:13px;white-space:nowrap">${formatDate(t.dateStart)}<br>${formatDate(t.dateEnd)}</td>
+                  <td style="font-size:13px;text-align:center">${t.categories.length}</td>
+                  <td style="font-size:13px;text-align:center">${t.matchCount} / ${t.resultsCount}</td>
+                  <td>${importStatusBadge(t.importStatus)}</td>
+                  <td>
+                    <button class="btn btn-ghost btn-sm" onclick="showMigrationDetail('${t._tid}')">Szczegóły</button>
+                  </td>
+                </tr>`;
+            }).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>`;
+}
+
+function renderConflictsSection() {
+  const issues = [];
+  migrationState.pendingTournaments.forEach(t => {
+    (t.issues || []).forEach(issue => {
+      issues.push({ tournament: t.name, ...issue });
+    });
+  });
+  if (!issues.length) return '';
+
+  return `
+    <div class="form-panel mig-conflicts-panel">
+      <div class="form-panel-title" style="color:var(--accent)">⚠️ Wymaga weryfikacji (${issues.length})</div>
+      <p style="font-size:13px;color:var(--text-muted);margin-bottom:16px">
+        Poniższe dane wymagają ręcznego sprawdzenia przed lub po imporcie.
+      </p>
+      ${issues.map((issue, i) => `
+        <div class="mig-conflict-row">
+          <div class="mig-conflict-info">
+            <div style="font-weight:600;font-size:13px">${issue.tournament}</div>
+            <div style="font-size:12px;color:var(--text-muted)">Kategoria: ${issue.cat} · Pole: ${issue.field}</div>
+            <div style="font-size:13px;margin-top:4px">${issue.problem}</div>
+            <div style="font-size:12px;color:var(--accent-dark);margin-top:2px">Sugerowane działanie: ${issue.action}</div>
+          </div>
+          <div style="display:flex;gap:8px;flex-shrink:0">
+            <button class="btn btn-secondary btn-sm" onclick="showToast('Otwórz edycję — funkcja dostępna po imporcie')">✏️ Popraw ręcznie</button>
+            <button class="btn btn-ghost btn-sm" onclick="this.closest('.mig-conflict-row').remove(); showToast('Pominięto')">Pomiń</button>
+          </div>
+        </div>`).join('')}
+    </div>`;
+}
+
+function showMigrationDetail(tid) {
+  const t = migrationState.pendingTournaments.find(t => t._tid === tid);
+  if (!t) return;
+  showToast(`${t.name}: ${t.categories.length} kategorii · ${t.matchCount} meczów · ${t.resultsCount} wyników`);
 }
 
 /* =============================================
