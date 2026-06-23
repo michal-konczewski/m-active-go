@@ -221,7 +221,10 @@
 
       <!-- Top Bar -->
       <div class="admin-topbar">
-        <h1 id="topbar-title">Dashboard</h1>
+        <div>
+          <h1 id="topbar-title">Dashboard</h1>
+          <div id="admin-breadcrumb" class="admin-breadcrumb"></div>
+        </div>
         <span class="badge badge-proto">Prototyp</span>
         <button class="btn btn-primary btn-sm" onclick="showSection('add-tournament')">
           ➕ Dodaj turniej
@@ -787,6 +790,9 @@
   <div id="pub-bracket" class="hidden">
     <div class="bracket-page">
       <div class="breadcrumb" id="bracket-breadcrumb"></div>
+      <button id="bracket-back-btn" class="btn btn-secondary btn-sm" style="margin-bottom:12px">
+        ← Wróć do kategorii
+      </button>
 
       <div class="bracket-header">
         <div class="bracket-title" id="bracket-category-title"></div>

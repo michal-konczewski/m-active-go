@@ -1967,3 +1967,23 @@ body.dark .match-row.is-winner .player-name {
   .pub-page { padding: 24px 16px; }
   .tournaments-grid { grid-template-columns: 1fr; }
 }
+
+/* Breadcrumb — wspólny */
+.admin-breadcrumb {
+  font-size: 12px;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+}
+
+.bc-link {
+  color: var(--accent);
+  cursor: pointer;
+  text-decoration: none;
+}
+.bc-link:hover { text-decoration: underline; }
+.bc-current { color: var(--text); font-weight: 600; }
+.breadcrumb-sep { color: var(--border-strong); }

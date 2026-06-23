@@ -160,14 +160,19 @@ const state = {
    VIEW SWITCHING
    ============================================= */
 
-function switchView(v) {
+function _switchView(v, skipHistory) {
   state.view = v;
   document.getElementById('admin-view').classList.toggle('hidden', v !== 'admin');
   document.getElementById('public-view').classList.toggle('hidden', v !== 'public');
   document.getElementById('btn-admin').classList.toggle('active', v === 'admin');
   document.getElementById('btn-public').classList.toggle('active', v !== 'admin');
+  if (v === 'public' && !skipHistory) _renderPublicHome(true);
+}
 
-  if (v === 'public') renderPublicHome();
+function switchView(v) {
+  _switchView(v);
+  if (v === 'public') navigate('public');
+  else navigate('admin');
 }
 
 /* =============================================
@@ -188,6 +193,50 @@ function initDarkMode() {
     }
   } catch(e) {}
 }
+
+/* =============================================
+   HASH ROUTER
+   ============================================= */
+
+function navigate(hash, replace) {
+  if (replace) {
+    history.replaceState(null, '', '#' + hash);
+  } else {
+    history.pushState(null, '', '#' + hash);
+  }
+}
+
+function routeCurrentHash() {
+  const raw = location.hash.replace(/^#/, '') || '';
+  const parts = raw.split('/');
+  const section = parts[0];
+
+  if (section === 'public') {
+    const tId  = parseInt(parts[1]);
+    const cId  = parseInt(parts[2]);
+    _switchView('public', true);
+    if (!isNaN(tId) && !isNaN(cId)) {
+      _showBracket(tId, cId, true);
+    } else if (!isNaN(tId)) {
+      _showPublicTournamentDetail(tId, true);
+    } else {
+      _renderPublicHome(true);
+    }
+  } else {
+    // admin section
+    _switchView('admin', true);
+    if (!state.adminLoggedIn) return;
+    const sub = parts[1];
+    if (sub === 'tournaments') _showSection('tournaments', true);
+    else if (sub === 'add-tournament') _showSection('add-tournament', true);
+    else if (sub === 'edit' && parts[2]) { state.editingTournamentId = parseInt(parts[2]); _showSection('edit-tournament', true); }
+    else if (sub === 'organizer') _showSection('organizer', true);
+    else if (sub === 'settings') _showSection('settings', true);
+    else _showSection('dashboard', true);
+  }
+}
+
+window.addEventListener('popstate', routeCurrentHash);
 
 /* =============================================
    TOAST
@@ -227,8 +276,9 @@ function adminLogin() {
   state.adminLoggedIn = true;
   document.getElementById('admin-login').classList.add('hidden');
   document.getElementById('admin-app').classList.remove('hidden');
-  renderDashboard();
   showToast('Zalogowano jako ' + email);
+  navigate('admin', true);  // replace, nie push — żeby back nie wracał do loginu
+  showSection('dashboard');
 }
 
 function adminLogout() {
@@ -252,27 +302,55 @@ const sectionTitles = {
   settings:           'Ustawienia'
 };
 
-function showSection(name) {
+function _showSection(name, skipHistory) {
   state.adminSection = name;
-
-  // Update sidebar active state
   document.querySelectorAll('.sidebar-item').forEach(btn => btn.classList.remove('active'));
   const navBtn = document.getElementById('nav-' + name);
   if (navBtn) navBtn.classList.add('active');
-
-  // Hide all sections
   document.querySelectorAll('.admin-section-content').forEach(s => s.classList.add('hidden'));
-
-  // Show target section
   const target = document.getElementById('sec-' + name);
   if (target) target.classList.remove('hidden');
-
-  // Update topbar title
   document.getElementById('topbar-title').textContent = sectionTitles[name] || name;
-
-  // Render dynamic sections
   if (name === 'dashboard') renderDashboard();
   if (name === 'tournaments') renderAdminTournamentList();
+  renderAdminBreadcrumb(name);
+}
+
+function showSection(name) {
+  _showSection(name);
+  const hashMap = {
+    dashboard: 'admin',
+    organizer: 'admin/organizer',
+    tournaments: 'admin/tournaments',
+    'add-tournament': 'admin/add-tournament',
+    settings: 'admin/settings',
+  };
+  if (name === 'edit-tournament' && state.editingTournamentId) {
+    navigate('admin/edit/' + state.editingTournamentId);
+  } else {
+    navigate(hashMap[name] || 'admin');
+  }
+}
+
+function renderAdminBreadcrumb(section) {
+  const el = document.getElementById('admin-breadcrumb');
+  if (!el) return;
+
+  const crumbs = {
+    dashboard:        [['Dashboard', null]],
+    organizer:        [['Dashboard', 'admin'], ['Dane M-ACTIVE', null]],
+    tournaments:      [['Dashboard', 'admin'], ['Turnieje', null]],
+    'add-tournament': [['Dashboard', 'admin'], ['Turnieje', 'admin/tournaments'], ['Dodaj turniej', null]],
+    'edit-tournament':[['Dashboard', 'admin'], ['Turnieje', 'admin/tournaments'], ['Edytuj turniej', null]],
+    settings:         [['Dashboard', 'admin'], ['Ustawienia', null]],
+  };
+
+  const items = crumbs[section] || [['Dashboard', null]];
+  el.innerHTML = items.map(([ label, hash ], i) =>
+    hash
+      ? `<span class="bc-link" onclick="navigate('${hash}')">${label}</span><span class="breadcrumb-sep">/</span>`
+      : `<span class="bc-current">${label}</span>`
+  ).join('');
 }
 
 /* =============================================
@@ -554,7 +632,7 @@ function renderPdfBrackets() {
    PUBLIC — Home
    ============================================= */
 
-function renderPublicHome() {
+function _renderPublicHome(skipHistory) {
   showPubSection('home');
   const grid = document.getElementById('pub-tournaments-grid');
   grid.innerHTML = state.tournaments.map(t => `
@@ -578,21 +656,29 @@ function renderPublicHome() {
     </div>`).join('');
 }
 
+function renderPublicHome() {
+  _renderPublicHome();
+  navigate('public');
+}
+
 function goPublicHome() {
-  renderPublicHome();
+  navigate('public');
 }
 
 /* =============================================
    PUBLIC — Tournament Detail
    ============================================= */
 
-function showPublicTournamentDetail(id) {
+function _showPublicTournamentDetail(id, skipHistory) {
   const t = state.tournaments.find(t => t.id === id);
   if (!t) return;
   state.selectedTournamentId = id;
   showPubSection('detail');
 
-  document.getElementById('detail-breadcrumb').textContent = t.name;
+  document.getElementById('detail-breadcrumb').innerHTML = `
+    <span class="bc-link" onclick="navigate('public')">Turnieje</span>
+    <span class="breadcrumb-sep">/</span>
+    <span>${t.name}</span>`;
   document.getElementById('detail-name').textContent = t.name;
   document.getElementById('detail-badge').innerHTML = badgeHtml(t.status);
   document.getElementById('detail-dates').textContent = formatDate(t.dateStart) + ' – ' + formatDate(t.dateEnd);
@@ -607,7 +693,6 @@ function showPublicTournamentDetail(id) {
     <div class="org-row"><span class="org-label">E-mail</span><span>${mockOrganizer.email}</span></div>
     <div class="org-row"><span class="org-label">WWW</span><span>${mockOrganizer.website}</span></div>`;
 
-  const statusLabel = { active: 'Aktywna', planned: 'Planowana', finished: 'Zakończona' };
   document.getElementById('pub-categories-grid').innerHTML = t.categories.map(c => `
     <div class="category-card" onclick="showBracket(${t.id}, ${c.id})">
       <div class="cc-name">${c.name}</div>
@@ -622,11 +707,16 @@ function showPublicTournamentDetail(id) {
     </div>`).join('');
 }
 
+function showPublicTournamentDetail(id) {
+  _showPublicTournamentDetail(id);
+  navigate('public/' + id);
+}
+
 /* =============================================
    PUBLIC — Bracket View
    ============================================= */
 
-function showBracket(tournamentId, categoryId) {
+function _showBracket(tournamentId, categoryId, skipHistory) {
   const t = state.tournaments.find(t => t.id === tournamentId);
   if (!t) return;
   const cat = t.categories.find(c => c.id === categoryId);
@@ -636,15 +726,15 @@ function showBracket(tournamentId, categoryId) {
   state.selectedCategoryId   = categoryId;
   showPubSection('bracket');
 
-  // Breadcrumb
   document.getElementById('bracket-breadcrumb').innerHTML = `
-    <span onclick="goPublicHome()">Turnieje</span>
+    <span class="bc-link" onclick="navigate('public')">Turnieje</span>
     <span class="breadcrumb-sep">/</span>
-    <span onclick="showPublicTournamentDetail(${t.id})">${t.name}</span>
+    <span class="bc-link" onclick="navigate('public/${t.id}')">${t.name}</span>
     <span class="breadcrumb-sep">/</span>
     <span class="current">${cat.name}</span>`;
 
-  // Title + meta
+  document.getElementById('bracket-back-btn').onclick = () => navigate('public/' + t.id);
+
   document.getElementById('bracket-category-title').textContent = cat.name;
   document.getElementById('bracket-meta').innerHTML = `
     <span>📋 ${cat.type}</span>
@@ -652,7 +742,6 @@ function showBracket(tournamentId, categoryId) {
     <span>📅 ${formatDate(t.dateStart)} – ${formatDate(t.dateEnd)}</span>
     <span>${badgeHtml(cat.status)}</span>`;
 
-  // Category switcher pills
   document.getElementById('bracket-category-switcher').innerHTML =
     t.categories.map(c => `
       <button class="cat-pill ${c.id === categoryId ? 'active' : ''}"
@@ -660,7 +749,6 @@ function showBracket(tournamentId, categoryId) {
         ${c.name}
       </button>`).join('');
 
-  // Render bracket
   const bracketArea = document.getElementById('bracket-scroll');
   const labelsArea  = document.getElementById('bracket-round-labels');
 
@@ -684,6 +772,11 @@ function showBracket(tournamentId, categoryId) {
 
   bracketArea.innerHTML = buildBracketHTML(cat.bracket, false);
   requestAnimationFrame(() => initBracketConnectors(bracketArea));
+}
+
+function showBracket(tournamentId, categoryId) {
+  _showBracket(tournamentId, categoryId);
+  navigate('public/' + tournamentId + '/' + categoryId);
 }
 
 /* =============================================
@@ -980,4 +1073,13 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('login-password').value = 'demo1234';
 
   initDarkMode();
+
+  // Route to current hash on initial load
+  const initHash = location.hash.replace(/^#/, '');
+  if (initHash && initHash !== 'admin') {
+    navigate(initHash, true);
+    routeCurrentHash();
+  } else {
+    navigate('admin', true);
+  }
 });
