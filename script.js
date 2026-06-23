@@ -89,7 +89,366 @@ const mixedOpenBracket = {
   winner: 'Nowak / Kamińska'
 };
 
+const archicup2026Tournament = {
+  id: 10,
+  name: "TENNIS ARCHI CUP 2026",
+  shortDesc: "XXXV MISTRZOSTWA POLSKI ARCHITEKTÓW W TENISIE",
+  dateStart: "2026-06-08",
+  dateEnd: "2026-06-14",
+  location: "Polska",
+  organizer: "M-ACTIVE",
+  status: "finished",
+  categories: [
+    {
+      id: 100,
+      name: 'DEBLE KOBIETY OPEN',
+      players: 7,
+      type: 'Drabinka',
+      status: 'finished',
+      categoryType: 'debel',
+      gender: 'kobiety',
+      level: 'open',
+      limit: 8,
+      format: 'elimination',
+      seedsCount: 2,
+      dateStart: '2026-06-12',
+      timeStart: '12:00',
+      participants: [],
+      bracket: {
+        r1: [mkMatch('dko-r1-1', 'r1', 'K. Tarnawska K. Żołnierek-Mazurek', 1, '', null, null, null, null, null, null, null, null, null, null, 'playerA'), mkMatch('dko-r1-2', 'r1', 'E. Sakwerda K. Wolak', null, 'A. Bonna M. Mejka', null, null, null, null, null, null, null, null, null, null, 'playerB'), mkMatch('dko-r1-3', 'r1', 'A. Bartczak N. Duczmal', null, 'D. Gotkiewicz P. Paczkowska', null, null, null, null, null, null, null, null, null, null, 'playerB'), mkMatch('dko-r1-4', 'r1', 'K. Białk A. Skrzyńska-Elert', null, 'M. Górska A. Wiśnicka-Trzaskowska', 2, null, null, null, null, null, null, null, null, null, 'playerB')],
+        sf: [mkMatch('dko-sf-1', 'sf', 'K. Tarnawska K. Żołnierek-Mazurek', null, 'A. Bonna M. Mejka', null, 5, 7, 6, 2, 10, 8, null, null, null, 'playerA'), mkMatch('dko-sf-2', 'sf', 'D. Gotkiewicz P. Paczkowska', null, 'M. Górska A. Wiśnicka-Trzaskowska', null, null, null, null, null, null, null, null, null, null, 'playerB')],
+        final: mkMatch('dko-final', 'final', 'K. Tarnawska K. Żołnierek-Mazurek', null, 'M. Górska A. Wiśnicka-Trzaskowska', null, 6, 3, 6, 2, null, null, null, null, null, 'playerA'),
+        third: mkMatch('dko-third', 'third', 'A. Bonna M. Mejka', null, 'D. Gotkiewicz P. Paczkowska', null, 4, 6, 2, 6, null, null, null, null, null, 'playerB')
+      }
+    },
+    {
+      id: 101,
+      name: 'DEBLE MĘŻCZYŹNI OPEN',
+      players: 4,
+      type: 'Drabinka',
+      status: 'finished',
+      categoryType: 'debel',
+      gender: 'mezczyzni',
+      level: 'open',
+      limit: 4,
+      format: 'elimination',
+      seedsCount: 2,
+      dateStart: '2026-06-12',
+      timeStart: '12:00',
+      participants: [],
+      bracket: {
+        r1: [mkMatch('dmo-r1-1', 'r1', 'O. Berent M. Wileński', 1, 'J. Folwarski T. Urbanowicz', null, null, null, null, null, null, null, null, null, null, 'playerB'), mkMatch('dmo-r1-2', 'r1', 'P. Frączek M. Lew', null, 'M. Mazurek M. Niewiadomski', 2, null, null, null, null, null, null, null, null, null, 'playerB')],
+        final: mkMatch('dmo-final', 'final', 'J. Folwarski T. Urbanowicz', null, 'M. Mazurek M. Niewiadomski', null, 6, 4, 6, 4, null, null, null, null, null, 'playerA'),
+        third: mkMatch('dmo-third', 'third', 'O. Berent M. Wileński', 1, 'P. Frączek M. Lew', null, 6, 2, 6, 2, null, null, null, null, null, 'playerA')
+      }
+    },
+    {
+      id: 102,
+      name: 'DEBLE MĘŻCZYŹNI 45+',
+      players: 4,
+      type: 'Drabinka',
+      status: 'finished',
+      categoryType: 'debel',
+      gender: 'mezczyzni',
+      level: '45+',
+      limit: 4,
+      format: 'elimination',
+      seedsCount: 2,
+      dateStart: '2026-06-12',
+      timeStart: '12:00',
+      participants: [],
+      bracket: {
+        r1: [mkMatch('dm45-r1-1', 'r1', 'G. Czaus J. Ratajczak', 1, 'D. Adamczyk J. Łukasik', null, null, null, null, null, null, null, null, null, null, 'playerA'), mkMatch('dm45-r1-2', 'r1', 'Ł. Matuszewski M. Więcek', null, 'K. Hunger M. Markowski', 2, null, null, null, null, null, null, null, null, null, 'playerB')],
+        final: mkMatch('dm45-final', 'final', 'G. Czaus J. Ratajczak', null, 'K. Hunger M. Markowski', null, 3, 6, 6, 3, 10, 5, null, null, null, 'playerA'),
+        third: mkMatch('dm45-third', 'third', 'D. Adamczyk J. Łukasik', null, 'Ł. Matuszewski M. Więcek', null, 6, 3, 6, 4, null, null, null, null, null, 'playerA')
+      }
+    },
+    {
+      id: 103,
+      name: 'DEBLE MĘŻCZYŹNI 55+',
+      players: 0,
+      type: 'Każdy z każdym',
+      status: 'finished',
+      categoryType: 'debel',
+      gender: 'mezczyzni',
+      level: '55+',
+      limit: 4,
+      format: 'roundrobin',
+      seedsCount: 0,
+      dateStart: '2026-06-12',
+      timeStart: '12:00',
+      participants: [],
+      bracket: null
+    },
+    {
+      id: 104,
+      name: 'MIKSTY OPEN',
+      players: 11,
+      type: 'Drabinka',
+      status: 'finished',
+      categoryType: 'mikst',
+      gender: 'open',
+      level: 'open',
+      limit: 16,
+      format: 'elimination',
+      seedsCount: 4,
+      dateStart: '2026-06-12',
+      timeStart: '12:00',
+      participants: [],
+      bracket: {
+        r1: [mkMatch('mx-r1-1', 'r1', 'D. Grochowska W. Gajewski', 1, '', null, null, null, null, null, null, null, null, null, null, 'playerA'), mkMatch('mx-r1-2', 'r1', 'A. Kochańska-Bojdak A. Kochański', null, 'M. Zmysłowska P. Zmysłowski', null, null, null, null, null, null, null, null, null, null, 'playerB'), mkMatch('mx-r1-3', 'r1', 'L. Ostrowska P. Becla', 3, '', null, null, null, null, null, null, null, null, null, null, 'playerA'), mkMatch('mx-r1-4', 'r1', 'A. Bednarczyk-Mleczko R. Mleczko', null, '', null, null, null, null, null, null, null, null, null, null, 'playerA'), mkMatch('mx-r1-5', 'r1', 'M. Niemiec R. Grzelewski', null, 'J. Pawłowska A. Borowicz', null, null, null, null, null, null, null, null, null, null, 'playerA'), mkMatch('mx-r1-6', 'r1', '', null, 'E. Śliwa M. Śliwa', 4, null, null, null, null, null, null, null, null, null, 'playerB'), mkMatch('mx-r1-7', 'r1', 'M. Mik-Piwowar W. Nowak', null, 'A. Bogusławska-Szulska A. Szulski', null, null, null, null, null, null, null, null, null, null, 'playerA'), mkMatch('mx-r1-8', 'r1', '', null, 'G. Zając J. Pachowski', 2, null, null, null, null, null, null, null, null, null, 'playerB')],
+        r2: [mkMatch('mx-r2-1', 'r2', 'D. Grochowska W. Gajewski', null, 'M. Zmysłowska P. Zmysłowski', null, 2, 6, 1, 6, null, null, null, null, null, 'playerB'), mkMatch('mx-r2-2', 'r2', 'L. Ostrowska P. Becla', null, 'A. Bednarczyk-Mleczko R. Mleczko', null, null, null, null, null, null, null, null, null, null, 'playerA'), mkMatch('mx-r2-3', 'r2', 'M. Niemiec R. Grzelewski', null, 'E. Śliwa M. Śliwa', null, 4, 6, 1, 6, null, null, null, null, null, 'playerB'), mkMatch('mx-r2-4', 'r2', 'M. Mik-Piwowar W. Nowak', null, 'G. Zając J. Pachowski', null, 2, 6, 1, 6, null, null, null, null, null, 'playerB')],
+        sf: [mkMatch('mx-sf-1', 'sf', 'M. Zmysłowska P. Zmysłowski', null, 'L. Ostrowska P. Becla', null, 2, 6, 4, 6, null, null, null, null, null, 'playerB'), mkMatch('mx-sf-2', 'sf', 'E. Śliwa M. Śliwa', null, 'G. Zając J. Pachowski', null, 2, 6, 1, 6, null, null, null, null, null, 'playerB')],
+        final: mkMatch('mx-final', 'final', 'L. Ostrowska P. Becla', null, 'G. Zając J. Pachowski', null, 3, 6, 5, 7, null, null, null, null, null, 'playerB'),
+        third: mkMatch('mx-third', 'third', 'M. Zmysłowska P. Zmysłowski', null, 'E. Śliwa M. Śliwa', 4, null, null, null, null, null, null, null, null, null, 'playerB')
+      }
+    },
+    {
+      id: 105,
+      name: 'SINGLE MĘŻCZYŹNI OPEN',
+      players: 23,
+      type: 'Drabinka',
+      status: 'finished',
+      categoryType: 'singiel',
+      gender: 'mezczyzni',
+      level: 'open',
+      limit: 32,
+      format: 'elimination',
+      seedsCount: 8,
+      dateStart: '2026-06-12',
+      timeStart: '12:00',
+      participants: [],
+      bracket: {
+        r1: [mkMatch('smo-r1-1', 'r1', 'J. Folwarski', 1, '', null, null, null, null, null, null, null, null, null, null, 'playerA'), mkMatch('smo-r1-2', 'r1', 'A. Borowicz', null, 'A. Drzewiecki', null, null, null, null, null, null, null, null, null, null, 'playerB'), mkMatch('smo-r1-3', 'r1', 'M. Kowalczyk', null, 'W. Nowak', null, null, null, null, null, null, null, null, null, null, 'playerB'), mkMatch('smo-r1-4', 'r1', '', null, 'T. Urbanowicz', 6, null, null, null, null, null, null, null, null, null, 'playerB'), mkMatch('smo-r1-5', 'r1', 'M. Tomczak', 3, '', null, null, null, null, null, null, null, null, null, null, 'playerA'), mkMatch('smo-r1-6', 'r1', 'M. Mazurek', null, '', null, null, null, null, null, null, null, null, null, null, 'playerA'), mkMatch('smo-r1-7', 'r1', 'P. Zmysłowski', null, 'M. Śliwa', null, null, null, null, null, null, null, null, null, null, 'playerB'), mkMatch('smo-r1-8', 'r1', '', null, 'K. Hunger', 7, null, null, null, null, null, null, null, null, null, 'playerB'), mkMatch('smo-r1-9', 'r1', 'M. Lew', 8, '', null, null, null, null, null, null, null, null, null, null, 'playerA'), mkMatch('smo-r1-10', 'r1', 'P. Ciałkowski', null, 'B. Popiela', null, null, null, null, null, null, null, null, null, null, 'playerA'), mkMatch('smo-r1-11', 'r1', 'V. Shupliak', null, 'W. Gajewski', null, null, null, null, null, null, null, null, null, null, 'playerB'), mkMatch('smo-r1-12', 'r1', '', null, 'R. Mleczko', 4, null, null, null, null, null, null, null, null, null, 'playerB'), mkMatch('smo-r1-13', 'r1', 'J. Pachowski', 5, '', null, null, null, null, null, null, null, null, null, null, 'playerA'), mkMatch('smo-r1-14', 'r1', 'O. Berent', null, 'J. Urbaniak', null, null, null, null, null, null, null, null, null, null, 'playerA'), mkMatch('smo-r1-15', 'r1', 'P. Osipowicz', null, 'P. Becla', null, null, null, null, null, null, null, null, null, null, 'playerB'), mkMatch('smo-r1-16', 'r1', '', null, 'T. Ginter', 2, null, null, null, null, null, null, null, null, null, 'playerB')],
+        r2: [mkMatch('smo-r2-1', 'r2', 'J. Folwarski', null, 'A. Drzewiecki', null, 7, 5, 6, 4, null, null, null, null, null, 'playerA'), mkMatch('smo-r2-2', 'r2', 'W. Nowak', null, 'T. Urbanowicz', null, 6, 0, 6, 0, null, null, null, null, null, 'playerA'), mkMatch('smo-r2-3', 'r2', 'M. Tomczak', null, 'M. Mazurek', null, null, null, null, null, null, null, null, null, null, 'playerA'), mkMatch('smo-r2-4', 'r2', 'M. Śliwa', null, 'K. Hunger', null, 1, 6, 4, 6, null, null, null, null, null, 'playerB'), mkMatch('smo-r2-5', 'r2', 'M. Lew', null, 'P. Ciałkowski', null, 0, 6, 0, 6, null, null, null, null, null, 'playerB'), mkMatch('smo-r2-6', 'r2', 'W. Gajewski', null, 'R. Mleczko', null, 0, 6, 1, 6, null, null, null, null, null, 'playerB'), mkMatch('smo-r2-7', 'r2', 'J. Pachowski', null, 'O. Berent', null, 0, 6, 0, 6, null, null, null, null, null, 'playerB'), mkMatch('smo-r2-8', 'r2', 'P. Becla', null, 'T. Ginter', null, 0, 6, 0, 6, null, null, null, null, null, 'playerB')],
+        qf: [mkMatch('smo-qf-1', 'qf', 'J. Folwarski', null, 'W. Nowak', null, 6, 0, 6, 2, null, null, null, null, null, 'playerA'), mkMatch('smo-qf-2', 'qf', 'M. Tomczak', null, 'K. Hunger', null, 6, 1, 6, 2, null, null, null, null, null, 'playerA'), mkMatch('smo-qf-3', 'qf', 'P. Ciałkowski', null, 'R. Mleczko', null, 6, 2, 6, 2, null, null, null, null, null, 'playerA'), mkMatch('smo-qf-4', 'qf', 'O. Berent', null, 'T. Ginter', null, 6, 0, 6, 7, 8, 10, null, null, null, 'playerB')],
+        sf: [mkMatch('smo-sf-1', 'sf', 'J. Folwarski', null, 'M. Tomczak', null, 6, 4, 4, 6, 10, 7, null, null, null, 'playerA'), mkMatch('smo-sf-2', 'sf', 'P. Ciałkowski', null, 'T. Ginter', null, 6, 1, 6, 0, null, null, null, null, null, 'playerA')],
+        final: mkMatch('smo-final', 'final', 'J. Folwarski', null, 'P. Ciałkowski', null, 6, 0, 6, 2, null, null, null, null, null, 'playerA'),
+        third: mkMatch('smo-third', 'third', 'M. Tomczak', 3, 'T. Ginter', 2, null, null, null, null, null, null, null, null, null, 'playerB')
+      }
+    },
+    {
+      id: 106,
+      name: 'SINGLE MĘŻCZYŹNI 45+',
+      players: 13,
+      type: 'Drabinka',
+      status: 'finished',
+      categoryType: 'singiel',
+      gender: 'mezczyzni',
+      level: '45+',
+      limit: 16,
+      format: 'elimination',
+      seedsCount: 4,
+      dateStart: '2026-06-12',
+      timeStart: '12:00',
+      participants: [],
+      bracket: {
+        r1: [mkMatch('sm45-r1-1', 'r1', 'G. Czaus', 1, '', null, null, null, null, null, null, null, null, null, null, 'playerA'), mkMatch('sm45-r1-2', 'r1', 'D. Adamczyk', null, 'Ł. Matuszewski', null, null, null, null, null, null, null, null, null, null, 'playerA'), mkMatch('sm45-r1-3', 'r1', 'M. Gochowski', 4, 'M. Górski', null, null, null, null, null, null, null, null, null, null, 'playerA'), mkMatch('sm45-r1-4', 'r1', 'R. Mielniczek', null, 'M. Mrówka', null, null, null, null, null, null, null, null, null, null, 'playerA'), mkMatch('sm45-r1-5', 'r1', 'R. Grzelewski', null, 'A. Szulski', null, null, null, null, null, null, null, null, null, null, 'playerB'), mkMatch('sm45-r1-6', 'r1', '', null, 'M. Wieliński', 3, null, null, null, null, null, null, null, null, null, 'playerB'), mkMatch('sm45-r1-7', 'r1', 'P. Frączek', null, 'M. Więcek', null, null, null, null, null, null, null, null, null, null, 'playerB'), mkMatch('sm45-r1-8', 'r1', '', null, 'M. Niewiadomski', 2, null, null, null, null, null, null, null, null, null, 'playerB')],
+        r2: [mkMatch('sm45-r2-1', 'r2', 'G. Czaus', null, 'D. Adamczyk', null, 2, 6, 6, 2, 14, 12, null, null, null, 'playerA'), mkMatch('sm45-r2-2', 'r2', 'M. Gochowski', null, 'R. Mielniczek', null, 6, 2, 6, 2, null, null, null, null, null, 'playerA'), mkMatch('sm45-r2-3', 'r2', 'A. Szulski', null, 'M. Wieliński', null, 0, 6, 0, 6, null, null, null, null, null, 'playerB'), mkMatch('sm45-r2-4', 'r2', 'M. Więcek', null, 'M. Niewiadomski', null, 4, 6, 7, 6, 5, 10, null, null, null, 'playerB')],
+        sf: [mkMatch('sm45-sf-1', 'sf', 'G. Czaus', null, 'M. Gochowski', null, 6, 0, 6, 3, null, null, null, null, null, 'playerA'), mkMatch('sm45-sf-2', 'sf', 'M. Wieliński', null, 'M. Niewiadomski', null, 6, 3, 6, 2, null, null, null, null, null, 'playerA')],
+        final: mkMatch('sm45-final', 'final', 'G. Czaus', null, 'M. Wieliński', null, 3, 6, 6, 0, 10, 8, null, null, null, 'playerA'),
+        third: mkMatch('sm45-third', 'third', 'M. Gochowski', 4, 'M. Niewiadomski', 2, null, null, null, null, null, null, null, null, null, null)
+      }
+    },
+    {
+      id: 107,
+      name: 'SINGLE MĘŻCZYŹNI 55+',
+      players: 9,
+      type: 'Drabinka',
+      status: 'finished',
+      categoryType: 'singiel',
+      gender: 'mezczyzni',
+      level: '55+',
+      limit: 16,
+      format: 'elimination',
+      seedsCount: 4,
+      dateStart: '2026-06-12',
+      timeStart: '12:00',
+      participants: [],
+      bracket: {
+        r1: [mkMatch('sm55-r1-1', 'r1', 'J. Łukasik', 1, '', null, null, null, null, null, null, null, null, null, null, 'playerA'), mkMatch('sm55-r1-2', 'r1', 'M. Markowski', null, '', null, null, null, null, null, null, null, null, null, null, 'playerA'), mkMatch('sm55-r1-3', 'r1', 'P. Piaskowicki', 3, '', null, null, null, null, null, null, null, null, null, null, 'playerA'), mkMatch('sm55-r1-4', 'r1', 'R. Lamorski', null, 'J. Ratajczak', null, null, null, null, null, null, null, null, null, null, 'playerB'), mkMatch('sm55-r1-5', 'r1', 'T. Janiszewski', null, '', null, null, null, null, null, null, null, null, null, null, 'playerA'), mkMatch('sm55-r1-6', 'r1', '', null, 'K. Fiedor', 4, null, null, null, null, null, null, null, null, null, 'playerB'), mkMatch('sm55-r1-7', 'r1', 'W. Małecki', null, '', null, null, null, null, null, null, null, null, null, null, 'playerA'), mkMatch('sm55-r1-8', 'r1', '', null, 'W. Wowie', 2, null, null, null, null, null, null, null, null, null, 'playerB')],
+        r2: [mkMatch('sm55-r2-1', 'r2', 'J. Łukasik', null, 'M. Markowski', null, null, null, null, null, null, null, null, null, null, 'playerA'), mkMatch('sm55-r2-2', 'r2', 'P. Piaskowicki', null, 'J. Ratajczak', null, 6, 4, 6, 3, null, null, null, null, null, 'playerA'), mkMatch('sm55-r2-3', 'r2', 'T. Janiszewski', null, 'K. Fiedor', null, null, null, null, null, null, null, null, null, null, 'playerA'), mkMatch('sm55-r2-4', 'r2', 'W. Małecki', null, 'W. Wowie', null, null, null, null, null, null, null, null, null, null, 'playerB')],
+        sf: [mkMatch('sm55-sf-1', 'sf', 'J. Łukasik', null, 'P. Piaskowicki', null, 6, 0, 6, 1, null, null, null, null, null, 'playerA'), mkMatch('sm55-sf-2', 'sf', 'T. Janiszewski', null, 'W. Wowie', null, 5, 7, 6, 4, 5, 10, null, null, null, 'playerB')],
+        final: mkMatch('sm55-final', 'final', 'J. Łukasik', null, 'W. Wowie', null, 6, 0, 6, 0, null, null, null, null, null, 'playerA'),
+        third: mkMatch('sm55-third', 'third', 'P. Piaskowicki', 3, 'T. Janiszewski', null, null, null, null, null, null, null, null, null, null, 'playerA')
+      }
+    },
+    {
+      id: 108,
+      name: 'SINGLE MĘŻCZYŹNI 65+',
+      players: 6,
+      type: 'Drabinka',
+      status: 'finished',
+      categoryType: 'singiel',
+      gender: 'mezczyzni',
+      level: '65+',
+      limit: 8,
+      format: 'elimination',
+      seedsCount: 2,
+      dateStart: '2026-06-12',
+      timeStart: '12:00',
+      participants: [],
+      bracket: {
+        r1: [mkMatch('sm65-r1-1', 'r1', 'B. Brzózka', 1, '', null, null, null, null, null, null, null, null, null, null, 'playerA'), mkMatch('sm65-r1-2', 'r1', 'T. Zaforymski', null, 'A. Wolny', null, null, null, null, null, null, null, null, null, null, 'playerB'), mkMatch('sm65-r1-3', 'r1', 'A. Kochański', null, 'P. Fischer', null, null, null, null, null, null, null, null, null, null, 'playerB'), mkMatch('sm65-r1-4', 'r1', '', null, 'A. Bartnik', 2, null, null, null, null, null, null, null, null, null, 'playerB')],
+        sf: [mkMatch('sm65-sf-1', 'sf', 'B. Brzózka', null, 'A. Wolny', null, 6, 0, 6, 2, null, null, null, null, null, 'playerA'), mkMatch('sm65-sf-2', 'sf', 'P. Fischer', null, 'A. Bartnik', null, 6, 4, 1, 6, 6, 10, null, null, null, 'playerB')],
+        final: mkMatch('sm65-final', 'final', 'B. Brzózka', null, 'A. Bartnik', null, 3, 6, 6, 7, null, null, null, null, null, 'playerB'),
+        third: mkMatch('sm65-third', 'third', 'A. Wolny', null, 'P. Fischer', null, null, null, null, null, null, null, null, null, null, 'playerB')
+      }
+    },
+    {
+      id: 109,
+      name: 'SINGLE KOBIETY OPEN',
+      players: 21,
+      type: 'Drabinka',
+      status: 'finished',
+      categoryType: 'singiel',
+      gender: 'kobiety',
+      level: 'open',
+      limit: 32,
+      format: 'elimination',
+      seedsCount: 8,
+      dateStart: '2026-06-12',
+      timeStart: '12:00',
+      participants: [],
+      bracket: {
+        r1: [mkMatch('sko-r1-1', 'r1', 'E. Śliwa', 1, '', null, null, null, null, null, null, null, null, null, null, 'playerA'), mkMatch('sko-r1-2', 'r1', 'A. Bonna', null, '', null, null, null, null, null, null, null, null, null, null, 'playerA'), mkMatch('sko-r1-3', 'r1', 'M. Mejka', null, 'K. Wolak', null, null, null, null, null, null, null, null, null, null, 'playerB'), mkMatch('sko-r1-4', 'r1', '', null, 'M. Mik-Piwowar', 6, null, null, null, null, null, null, null, null, null, 'playerB'), mkMatch('sko-r1-5', 'r1', 'A. Wiśnicka-Trzaskowska', 3, '', null, null, null, null, null, null, null, null, null, null, 'playerA'), mkMatch('sko-r1-6', 'r1', 'A. Olech', null, '', null, null, null, null, null, null, null, null, null, null, 'playerA'), mkMatch('sko-r1-7', 'r1', 'K. Białk', null, '', null, null, null, null, null, null, null, null, null, null, 'playerA'), mkMatch('sko-r1-8', 'r1', '', null, 'D. Grochowska', 5, null, null, null, null, null, null, null, null, null, 'playerB'), mkMatch('sko-r1-9', 'r1', 'A. Bartczak', 8, '', null, null, null, null, null, null, null, null, null, null, 'playerA'), mkMatch('sko-r1-10', 'r1', 'M. Sikora-Nowak', null, 'N. Duczmal', null, null, null, null, null, null, null, null, null, null, 'playerA'), mkMatch('sko-r1-11', 'r1', 'M. Zmysłowska', null, 'A. Oleszkiewicz', null, null, null, null, null, null, null, null, null, null, 'playerA'), mkMatch('sko-r1-12', 'r1', '', null, 'G. Zając', 4, null, null, null, null, null, null, null, null, null, 'playerB'), mkMatch('sko-r1-13', 'r1', 'N. Niemiec', 7, '', null, null, null, null, null, null, null, null, null, null, 'playerA'), mkMatch('sko-r1-14', 'r1', 'A. Skrzyńska-Elert', null, 'M. Zielińska', null, null, null, null, null, null, null, null, null, null, 'playerA'), mkMatch('sko-r1-15', 'r1', 'A. Kochańska-Bojdak', null, 'J. Pawłowska', null, null, null, null, null, null, null, null, null, null, 'playerA'), mkMatch('sko-r1-16', 'r1', '', null, 'L. Ostrowska', 2, null, null, null, null, null, null, null, null, null, 'playerB')],
+        r2: [mkMatch('sko-r2-1', 'r2', 'E. Śliwa', null, 'A. Bonna', null, null, null, null, null, null, null, null, null, null, 'playerA'), mkMatch('sko-r2-2', 'r2', 'K. Wolak', null, 'M. Mik-Piwowar', null, 5, 7, 1, 6, null, null, null, null, null, 'playerB'), mkMatch('sko-r2-3', 'r2', 'A. Wiśnicka-Trzaskowska', null, 'A. Olech', null, null, null, null, null, null, null, null, null, null, 'playerA'), mkMatch('sko-r2-4', 'r2', 'K. Białk', null, 'D. Grochowska', null, null, null, null, null, null, null, null, null, null, 'playerB'), mkMatch('sko-r2-5', 'r2', 'A. Bartczak', null, 'M. Sikora-Nowak', null, 2, 6, 1, 6, null, null, null, null, null, 'playerB'), mkMatch('sko-r2-6', 'r2', 'M. Zmysłowska', null, 'G. Zając', null, 6, 7, 4, 6, null, null, null, null, null, 'playerB'), mkMatch('sko-r2-7', 'r2', 'M. Niemiec', null, 'A. Skrzyńska-Elert', null, 6, 0, 6, 0, null, null, null, null, null, 'playerA'), mkMatch('sko-r2-8', 'r2', 'A. Kochańska-Bojdak', null, 'L. Ostrowska', null, 6, 7, 6, 7, null, null, null, null, null, 'playerB')],
+        qf: [mkMatch('sko-qf-1', 'qf', 'E. Śliwa', null, 'M. Mik-Piwowar', null, 6, 1, 6, 1, null, null, null, null, null, 'playerA'), mkMatch('sko-qf-2', 'qf', 'A. Wiśnicka-Trzaskowska', null, 'D. Grochowska', null, 6, 0, 6, 1, null, null, null, null, null, 'playerA'), mkMatch('sko-qf-3', 'qf', 'M. Sikora-Nowak', null, 'G. Zając', null, 4, 6, 7, 5, 8, 10, null, null, null, 'playerB'), mkMatch('sko-qf-4', 'qf', 'M. Niemiec', null, 'L. Ostrowska', null, 1, 6, 1, 6, null, null, null, null, null, 'playerB')],
+        sf: [mkMatch('sko-sf-1', 'sf', 'E. Śliwa', null, 'A. Wiśnicka-Trzaskowska', null, 6, 1, 6, 2, null, null, null, null, null, 'playerA'), mkMatch('sko-sf-2', 'sf', 'G. Zając', null, 'L. Ostrowska', null, 6, 1, 6, 0, null, null, null, null, null, 'playerA')],
+        final: mkMatch('sko-final', 'final', 'E. Śliwa', null, 'G. Zając', null, 6, 2, 6, 1, null, null, null, null, null, 'playerA'),
+        third: mkMatch('sko-third', 'third', 'A. Wiśnicka-Trzaskowska', 3, 'L. Ostrowska', 2, null, null, null, null, null, null, null, null, null, 'playerB')
+      }
+    },
+    {
+      id: 110,
+      name: 'SINGLE KOBIETY 45+',
+      players: 11,
+      type: 'Drabinka',
+      status: 'finished',
+      categoryType: 'singiel',
+      gender: 'kobiety',
+      level: '45+',
+      limit: 16,
+      format: 'elimination',
+      seedsCount: 4,
+      dateStart: '2026-06-12',
+      timeStart: '12:00',
+      participants: [],
+      bracket: {
+        r1: [mkMatch('sk45-r1-1', 'r1', 'E. Sakwerda', 1, '', null, null, null, null, null, null, null, null, null, null, 'playerA'), mkMatch('sk45-r1-2', 'r1', 'D. Gotkiewicz', null, 'A. Bogusławska-Szulska', null, null, null, null, null, null, null, null, null, null, 'playerB'), mkMatch('sk45-r1-3', 'r1', 'M. Górska', 3, '', null, null, null, null, null, null, null, null, null, null, 'playerA'), mkMatch('sk45-r1-4', 'r1', 'O. Knapik', null, '', null, null, null, null, null, null, null, null, null, null, 'playerA'), mkMatch('sk45-r1-5', 'r1', 'J. Małecka', null, 'K. Tarnawska', null, null, null, null, null, null, null, null, null, null, 'playerB'), mkMatch('sk45-r1-6', 'r1', '', null, 'A. Jamska-Kulka', 4, null, null, null, null, null, null, null, null, null, 'playerB'), mkMatch('sk45-r1-7', 'r1', 'P. Paczkowska', null, 'A. Bednarczyk-Mleczko', null, null, null, null, null, null, null, null, null, null, 'playerB'), mkMatch('sk45-r1-8', 'r1', '', null, 'K. Żołnierek-Mazurek', 2, null, null, null, null, null, null, null, null, null, 'playerB')],
+        r2: [mkMatch('sk45-r2-1', 'r2', 'E. Sakwerda', null, 'A. Bogusławska-Szulska', null, 2, 6, 6, 2, 10, 8, null, null, null, 'playerA'), mkMatch('sk45-r2-2', 'r2', 'M. Górska', null, 'O. Knapik', null, null, null, null, null, null, null, null, null, null, 'playerA'), mkMatch('sk45-r2-3', 'r2', 'K. Tarnawska', null, 'A. Jamska-Kulka', null, 3, 6, 4, 6, null, null, null, null, null, 'playerB'), mkMatch('sk45-r2-4', 'r2', 'A. Bednarczyk-Mleczko', null, 'K. Żołnierek-Mazurek', null, 2, 6, 2, 6, null, null, null, null, null, 'playerB')],
+        sf: [mkMatch('sk45-sf-1', 'sf', 'E. Sakwerda', null, 'M. Górska', null, 6, 2, 6, 2, null, null, null, null, null, 'playerA'), mkMatch('sk45-sf-2', 'sf', 'A. Jamska-Kulka', null, 'K. Żołnierek-Mazurek', null, 6, 4, 6, 3, null, null, null, null, null, 'playerA')],
+        final: mkMatch('sk45-final', 'final', 'E. Sakwerda', null, 'A. Jamska-Kulka', null, 6, 2, 6, 3, null, null, null, null, null, 'playerA'),
+        third: mkMatch('sk45-third', 'third', 'M. Górska', 3, 'K. Żołnierek-Mazurek', 2, null, null, null, null, null, null, null, null, null, 'playerA')
+      }
+    },
+    {
+      id: 111,
+      name: 'SINGLE MĘŻCZYŹNI OPEN - TURNIEJ POCIESZENIA',
+      players: 9,
+      type: 'Drabinka',
+      status: 'finished',
+      categoryType: 'singiel',
+      gender: 'mezczyzni',
+      level: 'open',
+      limit: 16,
+      format: 'elimination',
+      seedsCount: 4,
+      dateStart: '2026-06-08',
+      timeStart: '12:00',
+      participants: [],
+      bracket: {
+        r1: [mkMatch('smop-r1-1', 'r1', 'J. Pachowski', 1, '', null, null, null, null, null, null, null, null, null, null, 'playerA'), mkMatch('smop-r1-2', 'r1', 'M. Kowalczyk', null, 'V. Shupliak', null, null, null, null, null, null, null, null, null, null, 'playerA'), mkMatch('smop-r1-3', 'r1', 'M. Lew', 3, '', null, null, null, null, null, null, null, null, null, null, 'playerA'), mkMatch('smop-r1-4', 'r1', 'J. Urbaniak', null, '', null, null, null, null, null, null, null, null, null, null, 'playerA'), mkMatch('smop-r1-5', 'r1', 'P. Osipowicz', null, '', null, null, null, null, null, null, null, null, null, null, 'playerA'), mkMatch('smop-r1-6', 'r1', '', null, 'A. Borowicz', 4, null, null, null, null, null, null, null, null, null, 'playerB'), mkMatch('smop-r1-7', 'r1', 'B. Popiela', null, '', null, null, null, null, null, null, null, null, null, null, 'playerA'), mkMatch('smop-r1-8', 'r1', '', null, 'T. Urbanowicz', 2, null, null, null, null, null, null, null, null, null, 'playerB')],
+        r2: [mkMatch('smop-r2-1', 'r2', 'J. Pachowski', null, 'M. Kowalczyk', null, 6, 3, null, null, null, null, null, null, null, 'playerA'), mkMatch('smop-r2-2', 'r2', 'M. Lew', null, 'J. Urbaniak', null, null, null, null, null, null, null, null, null, null, 'playerA'), mkMatch('smop-r2-3', 'r2', 'P. Osipowicz', null, 'A. Borowicz', null, null, null, null, null, null, null, null, null, null, 'playerB'), mkMatch('smop-r2-4', 'r2', 'B. Popiela', null, 'T. Urbanowicz', null, null, null, null, null, null, null, null, null, null, 'playerB')],
+        sf: [mkMatch('smop-sf-1', 'sf', 'J. Pachowski', null, 'M. Lew', null, 0, 6, null, null, null, null, null, null, null, 'playerB'), mkMatch('smop-sf-2', 'sf', 'A. Borowicz', null, 'T. Urbanowicz', null, 0, 6, null, null, null, null, null, null, null, 'playerB')],
+        final: mkMatch('smop-final', 'final', 'M. Lew', null, 'T. Urbanowicz', null, 2, 6, null, null, null, null, null, null, null, 'playerB')
+      }
+    },
+    {
+      id: 112,
+      name: 'SINGLE MĘŻCZYŹNI 45+ - TURNIEJ POCIESZENIA',
+      players: 5,
+      type: 'Drabinka',
+      status: 'finished',
+      categoryType: 'singiel',
+      gender: 'mezczyzni',
+      level: '45+',
+      limit: 8,
+      format: 'elimination',
+      seedsCount: 0,
+      dateStart: '2026-06-08',
+      timeStart: '12:00',
+      participants: [],
+      bracket: {
+        r1: [mkMatch('sm45p-r1-1', 'r1', 'P. Frączek', null, '', null, null, null, null, null, null, null, null, null, null, 'playerA'), mkMatch('sm45p-r1-2', 'r1', 'R. Grzelewski', null, '', null, null, null, null, null, null, null, null, null, null, 'playerA'), mkMatch('sm45p-r1-3', 'r1', 'Ł. Matuszewski', null, '', null, null, null, null, null, null, null, null, null, null, 'playerA'), mkMatch('sm45p-r1-4', 'r1', 'M. Górski', null, 'M. Mrówka', null, null, null, null, null, null, null, null, null, null, 'playerA')],
+        sf: [mkMatch('sm45p-sf-1', 'sf', 'P. Frączek', null, 'R. Grzelewski', null, null, null, null, null, null, null, null, null, null, 'playerA'), mkMatch('sm45p-sf-2', 'sf', 'Ł. Matuszewski', null, 'M. Górski', null, 1, 6, null, null, null, null, null, null, null, 'playerB')],
+        final: mkMatch('sm45p-final', 'final', 'P. Frączek', null, 'M. Górski', null, 6, 2, null, null, null, null, null, null, null, 'playerA')
+      }
+    },
+    {
+      id: 113,
+      name: 'SINGLE MĘŻCZYŹNI 55+ - TURNIEJ POCIESZENIA',
+      players: 5,
+      type: 'Drabinka',
+      status: 'finished',
+      categoryType: 'singiel',
+      gender: 'mezczyzni',
+      level: '55+',
+      limit: 8,
+      format: 'elimination',
+      seedsCount: 0,
+      dateStart: '2026-06-08',
+      timeStart: '12:00',
+      participants: [],
+      bracket: {
+        r1: [mkMatch('sm55p-r1-1', 'r1', 'M. Markowski', null, '', null, null, null, null, null, null, null, null, null, null, 'playerA'), mkMatch('sm55p-r1-2', 'r1', 'T. Zaforymski', null, '', null, null, null, null, null, null, null, null, null, null, 'playerA'), mkMatch('sm55p-r1-3', 'r1', 'R. Lamorski', null, 'W. Małecki', null, null, null, null, null, null, null, null, null, null, 'playerA'), mkMatch('sm55p-r1-4', 'r1', 'A. Kochański', null, '', null, null, null, null, null, null, null, null, null, null, 'playerA')],
+        sf: [mkMatch('sm55p-sf-1', 'sf', 'M. Markowski', null, 'T. Zaforymski', null, null, null, null, null, null, null, null, null, null, 'playerB'), mkMatch('sm55p-sf-2', 'sf', 'R. Lamorski', null, 'A. Kochański', null, 6, 0, null, null, null, null, null, null, null, 'playerA')],
+        final: mkMatch('sm55p-final', 'final', 'T. Zaforymski', null, 'R. Lamorski', null, 3, 6, null, null, null, null, null, null, null, 'playerB')
+      }
+    },
+    {
+      id: 114,
+      name: 'SINGLE KOBIETY OPEN - TURNIEJ POCIESZENIA',
+      players: 7,
+      type: 'Drabinka',
+      status: 'finished',
+      categoryType: 'singiel',
+      gender: 'kobiety',
+      level: 'open',
+      limit: 8,
+      format: 'elimination',
+      seedsCount: 2,
+      dateStart: '2026-06-08',
+      timeStart: '12:00',
+      participants: [],
+      bracket: {
+        r1: [mkMatch('skop-r1-1', 'r1', 'A. Bartczak', 1, '', null, null, null, null, null, null, null, null, null, null, 'playerA'), mkMatch('skop-r1-2', 'r1', 'A. Bonna', null, 'M. Zielińska', null, null, null, null, null, null, null, null, null, null, 'playerA'), mkMatch('skop-r1-3', 'r1', 'K. Białk', null, 'N. Duczmal', null, null, null, null, null, null, null, null, null, null, 'playerA'), mkMatch('skop-r1-4', 'r1', 'M. Mejka', null, 'J. Pawłowska', 2, null, null, null, null, null, null, null, null, null, 'playerA')],
+        sf: [mkMatch('skop-sf-1', 'sf', 'A. Bartczak', null, 'A. Bonna', null, 0, 6, null, null, null, null, null, null, null, 'playerB'), mkMatch('skop-sf-2', 'sf', 'K. Białk', null, 'M. Mejka', null, 6, 4, null, null, null, null, null, null, null, 'playerA')],
+        final: mkMatch('skop-final', 'final', 'A. Bonna', null, 'K. Białk', null, 6, 2, null, null, null, null, null, null, null, 'playerA')
+      }
+    },
+    {
+      id: 115,
+      name: 'SINGLE KOBIETY 45+ - TURNIEJ POCIESZENIA',
+      players: 0,
+      type: 'Każdy z każdym',
+      status: 'finished',
+      categoryType: 'singiel',
+      gender: 'kobiety',
+      level: '45+',
+      limit: 4,
+      format: 'roundrobin',
+      seedsCount: 0,
+      dateStart: '2026-06-08',
+      timeStart: '12:00',
+      participants: [],
+      bracket: null
+    }
+  ]
+};
+
 const mockTournaments = [
+  archicup2026Tournament,
   {
     id: 1,
     name: "M-ACTIVE Summer Cup 2026",
@@ -932,7 +1291,13 @@ function buildBracketHTML(bData, compact, adminMode, isBlank) {
     return buildMatchCardHTML(match, !!adminMode, !!isBlank);
   };
 
-  const rounds = bData.r1 ? (bData.r2 ? [bData.r1, bData.r2, bData.qf, bData.sf, [bData.final]] : [bData.r1, bData.sf, [bData.final]]) : [[bData.final]];
+  const rounds = bData.r1
+    ? (bData.r2
+      ? (bData.qf
+        ? [bData.r1, bData.r2, bData.qf, bData.sf, [bData.final]]
+        : [bData.r1, bData.r2, bData.sf, [bData.final]])
+      : [bData.r1, bData.sf, [bData.final]])
+    : [[bData.final]];
   const filteredRounds = rounds.filter(Boolean);
 
   const renderRounds = () => {
