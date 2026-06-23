@@ -6,24 +6,68 @@
 
 /* === CSS Variables === */
 :root {
+  /* Brand */
   --accent:        #6CC030;
   --accent-dark:   #58A025;
-  --accent-light:  #EBF8DC;
-  --accent-mid:    #C5E9A0;
-  --bg:            #F2F5F8;
-  --card:          #FFFFFF;
+  --accent-light:  rgba(108,192,48,0.18);
+  --accent-mid:    rgba(108,192,48,0.35);
+
+  /* Layout */
+  --bg:            linear-gradient(135deg, #d9f0e0 0%, #cce4f5 45%, #ecdff5 100%);
+  --bg-solid:      #e4eff8;
+  --sidebar-bg:    rgba(15,25,40,0.82);
+
+  /* Glass */
+  --glass:         rgba(255,255,255,0.62);
+  --glass-hover:   rgba(255,255,255,0.78);
+  --glass-border:  rgba(255,255,255,0.75);
+  --glass-blur:    blur(20px);
+  --glass-inset:   inset 0 1px 0 rgba(255,255,255,0.85);
+
+  /* Legacy card alias */
+  --card:          rgba(255,255,255,0.62);
+
+  /* Text */
   --text:          #1A2332;
-  --text-muted:    #6B7280;
+  --text-muted:    #4A5568;
   --text-light:    #9CA3AF;
-  --border:        #E2E6EA;
-  --border-strong: #CBD3DC;
-  --shadow-sm:     0 1px 3px rgba(0,0,0,0.07);
-  --shadow:        0 4px 12px rgba(0,0,0,0.08);
-  --shadow-lg:     0 8px 32px rgba(0,0,0,0.12);
-  --radius:        10px;
-  --radius-lg:     16px;
+
+  /* Borders */
+  --border:        rgba(255,255,255,0.6);
+  --border-strong: rgba(0,0,0,0.12);
+
+  /* Shadows */
+  --shadow-sm:  0 2px 8px rgba(31,60,120,0.08), var(--glass-inset);
+  --shadow:     0 8px 28px rgba(31,60,120,0.12), var(--glass-inset);
+  --shadow-lg:  0 20px 60px rgba(31,60,120,0.18), var(--glass-inset);
+
+  /* Shape */
+  --radius:        14px;
+  --radius-lg:     20px;
   --sidebar-w:     240px;
   --toggle-h:      48px;
+}
+
+/* === Dark Mode === */
+body.dark {
+  --bg:            linear-gradient(135deg, #071422 0%, #091a10 45%, #140722 100%);
+  --bg-solid:      #0a1422;
+  --sidebar-bg:    rgba(5,10,18,0.9);
+  --glass:         rgba(255,255,255,0.07);
+  --glass-hover:   rgba(255,255,255,0.12);
+  --glass-border:  rgba(255,255,255,0.12);
+  --glass-inset:   inset 0 1px 0 rgba(255,255,255,0.08);
+  --card:          rgba(255,255,255,0.07);
+  --text:          #E8F0F8;
+  --text-muted:    #8DA0B8;
+  --text-light:    #556677;
+  --border:        rgba(255,255,255,0.1);
+  --border-strong: rgba(255,255,255,0.2);
+  --shadow-sm:  0 2px 8px rgba(0,0,0,0.4), var(--glass-inset);
+  --shadow:     0 8px 28px rgba(0,0,0,0.5), var(--glass-inset);
+  --shadow-lg:  0 20px 60px rgba(0,0,0,0.6), var(--glass-inset);
+  --accent-light:  rgba(108,192,48,0.18);
+  --accent-mid:    rgba(108,192,48,0.3);
 }
 
 /* === Reset & Base === */
@@ -34,8 +78,19 @@ html { font-size: 16px; -webkit-font-smoothing: antialiased; }
 body {
   font-family: 'Inter', system-ui, sans-serif;
   background: var(--bg);
+  background-attachment: fixed;
   color: var(--text);
   line-height: 1.5;
+  transition: background 0.4s ease, color 0.3s ease;
+}
+
+/* Glass utility — apply to any panel */
+.glass {
+  background: var(--glass);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow);
 }
 
 /* === View Toggle Bar === */
@@ -43,14 +98,31 @@ body {
   position: fixed;
   top: 0; left: 0; right: 0;
   height: var(--toggle-h);
-  background: var(--text);
+  background: rgba(10,18,30,0.82);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-bottom: 1px solid rgba(255,255,255,0.08);
   display: flex;
   align-items: center;
   gap: 4px;
   padding: 0 20px;
   z-index: 2000;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  box-shadow: 0 2px 16px rgba(0,0,0,0.25);
 }
+
+/* Dark mode toggle button */
+.dark-toggle {
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 8px;
+  padding: 5px 10px;
+  font-size: 15px;
+  cursor: pointer;
+  transition: background 0.15s;
+  margin-right: 8px;
+  line-height: 1;
+}
+.dark-toggle:hover { background: rgba(255,255,255,0.15); }
 
 #view-toggle .toggle-logo {
   font-size: 13px;
@@ -150,7 +222,10 @@ body {
 }
 
 .modal-box {
-  background: var(--card);
+  background: var(--glass);
+  backdrop-filter: blur(32px);
+  -webkit-backdrop-filter: blur(32px);
+  border: 1px solid var(--glass-border);
   border-radius: var(--radius-lg);
   padding: 36px;
   max-width: 500px;
@@ -202,18 +277,28 @@ body {
 .btn-primary:hover { background: var(--accent-dark); border-color: var(--accent-dark); }
 
 .btn-secondary {
-  background: var(--card);
+  background: rgba(255,255,255,0.55);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   color: var(--text);
   border-color: var(--border-strong);
 }
-.btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+.btn-secondary:hover { background: rgba(255,255,255,0.8); border-color: var(--accent); color: var(--accent); }
 
 .btn-ghost {
   background: transparent;
   color: var(--text-muted);
   border-color: transparent;
 }
-.btn-ghost:hover { background: var(--bg); color: var(--text); }
+.btn-ghost:hover { background: rgba(255,255,255,0.3); color: var(--text); }
+
+body.dark .btn-secondary {
+  background: rgba(255,255,255,0.08);
+  border-color: rgba(255,255,255,0.15);
+  color: var(--text);
+}
+body.dark .btn-secondary:hover { background: rgba(255,255,255,0.15); }
+body.dark .btn-ghost:hover { background: rgba(255,255,255,0.08); }
 
 .btn-sm { padding: 6px 12px; font-size: 12.5px; }
 .btn-lg { padding: 12px 26px; font-size: 15px; }
@@ -254,12 +339,14 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #F0F4F8 0%, #E8F4F0 100%);
   padding: 40px 20px;
 }
 
 .login-card {
-  background: var(--card);
+  background: var(--glass);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
   border-radius: var(--radius-lg);
   padding: 48px 44px;
   width: 100%;
@@ -320,13 +407,21 @@ body {
 .form-input {
   width: 100%;
   padding: 10px 14px;
-  border: 1.5px solid var(--border);
+  border: 1.5px solid var(--border-strong);
   border-radius: 8px;
   font-size: 14px;
   font-family: inherit;
   color: var(--text);
-  background: var(--card);
-  transition: border-color 0.15s, box-shadow 0.15s;
+  background: rgba(255,255,255,0.5);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
+}
+
+body.dark .form-input {
+  background: rgba(255,255,255,0.06);
+  border-color: rgba(255,255,255,0.12);
+  color: var(--text);
 }
 
 .form-input:focus {
@@ -356,7 +451,10 @@ body {
 /* Sidebar */
 #admin-sidebar {
   width: var(--sidebar-w);
-  background: var(--text);
+  background: var(--sidebar-bg);
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
+  border-right: 1px solid rgba(255,255,255,0.06);
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
@@ -450,7 +548,9 @@ body {
   gap: 16px;
   padding: 20px 32px 16px;
   border-bottom: 1px solid var(--border);
-  background: var(--card);
+  background: var(--glass);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
 }
 
 .admin-topbar h1 {
@@ -472,15 +572,17 @@ body {
 }
 
 .stat-card {
-  background: var(--card);
+  background: var(--glass);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
   border-radius: var(--radius);
   padding: 24px;
-  border: 1px solid var(--border);
+  border: 1px solid var(--glass-border);
   box-shadow: var(--shadow-sm);
-  transition: box-shadow 0.2s;
+  transition: box-shadow 0.2s, background 0.2s;
 }
 
-.stat-card:hover { box-shadow: var(--shadow); }
+.stat-card:hover { background: var(--glass-hover); box-shadow: var(--shadow); }
 
 .stat-label {
   font-size: 12px;
@@ -531,9 +633,11 @@ body {
 
 /* === Form Panel === */
 .form-panel {
-  background: var(--card);
+  background: var(--glass);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
   border-radius: var(--radius);
-  border: 1px solid var(--border);
+  border: 1px solid var(--glass-border);
   box-shadow: var(--shadow-sm);
   padding: 28px;
   margin-bottom: 24px;
@@ -621,9 +725,11 @@ textarea.form-input { resize: vertical; min-height: 100px; }
 
 /* === Tournament List (Admin) === */
 .tournament-table-wrap {
-  background: var(--card);
+  background: var(--glass);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
   border-radius: var(--radius);
-  border: 1px solid var(--border);
+  border: 1px solid var(--glass-border);
   box-shadow: var(--shadow-sm);
   overflow: hidden;
 }
@@ -642,7 +748,7 @@ textarea.form-input { resize: vertical; min-height: 100px; }
   color: var(--text-muted);
   padding: 14px 16px;
   border-bottom: 1px solid var(--border);
-  background: var(--bg);
+  background: rgba(0,0,0,0.04);
 }
 
 .t-table td {
@@ -654,7 +760,7 @@ textarea.form-input { resize: vertical; min-height: 100px; }
 
 .t-table tr:last-child td { border-bottom: none; }
 
-.t-table tr:hover td { background: #FAFBFC; }
+.t-table tr:hover td { background: rgba(255,255,255,0.2); }
 
 .t-name { font-weight: 600; font-size: 14px; }
 .t-sub  { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
@@ -669,8 +775,10 @@ textarea.form-input { resize: vertical; min-height: 100px; }
   position: sticky;
   top: var(--toggle-h);
   z-index: 100;
-  background: var(--card);
-  border-bottom: 1px solid var(--border);
+  background: var(--glass);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border-bottom: 1px solid var(--glass-border);
   box-shadow: var(--shadow-sm);
 }
 
@@ -725,11 +833,15 @@ textarea.form-input { resize: vertical; min-height: 100px; }
 .pub-hero {
   text-align: center;
   padding: 70px 20px 60px;
-  background: linear-gradient(135deg, #EAF5E0 0%, #F0F7F0 50%, #E8EFF8 100%);
+  background: var(--glass);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
   border-radius: var(--radius-lg);
   margin-bottom: 48px;
   position: relative;
   overflow: hidden;
+  box-shadow: var(--shadow);
 }
 
 .pub-hero::before {
@@ -800,9 +912,11 @@ textarea.form-input { resize: vertical; min-height: 100px; }
 }
 
 .tournament-card {
-  background: var(--card);
+  background: var(--glass);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
   border-radius: var(--radius);
-  border: 1px solid var(--border);
+  border: 1px solid var(--glass-border);
   box-shadow: var(--shadow-sm);
   padding: 24px;
   cursor: pointer;
@@ -813,9 +927,10 @@ textarea.form-input { resize: vertical; min-height: 100px; }
 }
 
 .tournament-card:hover {
+  background: var(--glass-hover);
   box-shadow: var(--shadow);
-  border-color: var(--accent-mid);
-  transform: translateY(-2px);
+  border-color: rgba(108,192,48,0.5);
+  transform: translateY(-3px);
 }
 
 .tc-header {
@@ -949,9 +1064,11 @@ textarea.form-input { resize: vertical; min-height: 100px; }
 }
 
 .detail-panel {
-  background: var(--card);
+  background: var(--glass);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
   border-radius: var(--radius);
-  border: 1px solid var(--border);
+  border: 1px solid var(--glass-border);
   box-shadow: var(--shadow-sm);
   padding: 28px;
 }
@@ -1000,8 +1117,10 @@ textarea.form-input { resize: vertical; min-height: 100px; }
 }
 
 .category-card {
-  background: var(--card);
-  border: 1.5px solid var(--border);
+  background: var(--glass);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1.5px solid var(--glass-border);
   border-radius: var(--radius);
   padding: 20px;
   cursor: pointer;
@@ -1062,8 +1181,10 @@ textarea.form-input { resize: vertical; min-height: 100px; }
 .cat-pill {
   padding: 7px 16px;
   border-radius: 20px;
-  border: 1.5px solid var(--border);
-  background: var(--card);
+  border: 1.5px solid var(--glass-border);
+  background: var(--glass);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   font-size: 12.5px;
   font-weight: 500;
   color: var(--text-muted);
@@ -1077,8 +1198,10 @@ textarea.form-input { resize: vertical; min-height: 100px; }
 
 /* Bracket visualization */
 .bracket-container {
-  background: var(--card);
-  border: 1px solid var(--border);
+  background: var(--glass);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
   border-radius: var(--radius);
   box-shadow: var(--shadow-sm);
   padding: 28px;
@@ -1144,8 +1267,10 @@ textarea.form-input { resize: vertical; min-height: 100px; }
 
 /* Match card in bracket */
 .b-match {
-  background: var(--card);
-  border: 1.5px solid var(--border);
+  background: var(--glass);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1.5px solid var(--glass-border);
   border-radius: 8px;
   overflow: hidden;
   flex-shrink: 0;
@@ -1465,8 +1590,10 @@ textarea.form-input { resize: vertical; min-height: 100px; }
 }
 
 .info-card {
-  background: var(--card);
-  border: 1px solid var(--border);
+  background: var(--glass);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
   border-radius: var(--radius);
   padding: 28px;
   box-shadow: var(--shadow-sm);
@@ -1490,8 +1617,10 @@ textarea.form-input { resize: vertical; min-height: 100px; }
 .contact-value { font-size: 15px; font-weight: 500; }
 
 .contact-form-panel {
-  background: var(--card);
-  border: 1px solid var(--border);
+  background: var(--glass);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
   border-radius: var(--radius);
   padding: 32px;
   box-shadow: var(--shadow-sm);
@@ -1501,8 +1630,10 @@ textarea.form-input { resize: vertical; min-height: 100px; }
 
 /* Settings page */
 .settings-group {
-  background: var(--card);
-  border: 1px solid var(--border);
+  background: var(--glass);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
   border-radius: var(--radius);
   box-shadow: var(--shadow-sm);
   margin-bottom: 24px;

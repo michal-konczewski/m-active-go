@@ -149,6 +149,25 @@ function switchView(v) {
 }
 
 /* =============================================
+   DARK MODE
+   ============================================= */
+
+function toggleDarkMode() {
+  const dark = document.body.classList.toggle('dark');
+  document.getElementById('dark-toggle-icon').textContent = dark ? '☀️' : '🌙';
+  try { localStorage.setItem('mactive-dark', dark ? '1' : '0'); } catch(e) {}
+}
+
+function initDarkMode() {
+  try {
+    if (localStorage.getItem('mactive-dark') === '1') {
+      document.body.classList.add('dark');
+      document.getElementById('dark-toggle-icon').textContent = '☀️';
+    }
+  } catch(e) {}
+}
+
+/* =============================================
    TOAST
    ============================================= */
 
@@ -802,4 +821,6 @@ document.addEventListener('DOMContentLoaded', () => {
   // Pre-fill demo credentials for ease of demo
   document.getElementById('login-email').value = 'admin@m-active.pl';
   document.getElementById('login-password').value = 'demo1234';
+
+  initDarkMode();
 });
