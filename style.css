@@ -451,9 +451,6 @@ body {
   padding: 20px 32px 16px;
   border-bottom: 1px solid var(--border);
   background: var(--card);
-  position: sticky;
-  top: var(--toggle-h);
-  z-index: 100;
 }
 
 .admin-topbar h1 {
@@ -1422,9 +1419,168 @@ textarea.form-input { resize: vertical; min-height: 100px; }
   border-color: #CBD3DC;
 }
 
+/* PDF Landscape bracket pages */
+.pdf-page-landscape {
+  max-width: 1100px;
+  min-height: auto;
+  padding: 40px 60px;
+}
+
+.pdf-page-landscape .pdf-bracket {
+  height: 440px;
+}
+
+.pdf-page-landscape .pdf-bracket .bracket-round {
+  width: 200px;
+}
+
+/* Public info pages */
+.pub-info-page {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 48px 28px;
+}
+
+.pub-info-hero {
+  margin-bottom: 48px;
+}
+
+.pub-info-hero .section-eyebrow { margin-bottom: 8px; }
+.pub-info-hero .section-h2 { font-size: 32px; margin-bottom: 12px; }
+.pub-info-hero p { font-size: 16px; color: var(--text-muted); line-height: 1.7; }
+
+.info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-bottom: 40px;
+}
+
+.info-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 28px;
+  box-shadow: var(--shadow-sm);
+}
+
+.info-card-icon { font-size: 28px; margin-bottom: 12px; }
+.info-card h3 { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+.info-card p { font-size: 13.5px; color: var(--text-muted); line-height: 1.65; }
+
+.contact-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 20px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.contact-row:last-child { border-bottom: none; }
+.contact-icon { font-size: 20px; width: 36px; flex-shrink: 0; padding-top: 2px; }
+.contact-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); margin-bottom: 4px; }
+.contact-value { font-size: 15px; font-weight: 500; }
+
+.contact-form-panel {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 32px;
+  box-shadow: var(--shadow-sm);
+}
+
+.contact-form-panel h2 { font-size: 18px; font-weight: 700; margin-bottom: 20px; }
+
+/* Settings page */
+.settings-group {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 24px;
+  overflow: hidden;
+}
+
+.settings-group-title {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+  padding: 14px 24px;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+}
+
+.settings-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--border);
+}
+
+.settings-row:last-child { border-bottom: none; }
+.settings-row-label { flex: 1; }
+.settings-row-label strong { font-size: 14px; display: block; margin-bottom: 2px; }
+.settings-row-label span { font-size: 12.5px; color: var(--text-muted); }
+
+/* Toggle switch */
+.toggle-switch {
+  position: relative;
+  width: 44px;
+  height: 24px;
+  flex-shrink: 0;
+}
+
+.toggle-switch input { display: none; }
+
+.toggle-switch label {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 12px;
+  background: var(--border-strong);
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.toggle-switch input:checked + label { background: var(--accent); }
+
+.toggle-switch label::after {
+  content: '';
+  position: absolute;
+  width: 18px; height: 18px;
+  background: #fff;
+  border-radius: 50%;
+  top: 3px; left: 3px;
+  transition: left 0.2s;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+.toggle-switch input:checked + label::after { left: 23px; }
+
+/* Edit tournament banner */
+.edit-banner {
+  background: var(--accent-light);
+  border: 1.5px solid var(--accent-mid);
+  border-radius: var(--radius);
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+  font-size: 13.5px;
+}
+
+.edit-banner strong { font-weight: 700; color: var(--accent-dark); }
+
 /* =============================================
    @media print
    ============================================= */
+
+@page { size: A4 portrait; margin: 0; }
+@page landscape-page { size: A4 landscape; margin: 0; }
 
 @media print {
   #view-toggle, #admin-view { display: none !important; }
@@ -1440,6 +1596,11 @@ textarea.form-input { resize: vertical; min-height: 100px; }
     margin: 0 !important;
     padding: 40px 60px !important;
     min-height: auto !important;
+    page: portrait-page;
+  }
+  .pdf-page-landscape {
+    page: landscape-page;
+    padding: 30px 50px !important;
   }
   .pdf-page:last-child { page-break-after: auto; break-after: auto; }
 }

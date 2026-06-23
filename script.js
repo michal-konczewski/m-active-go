@@ -123,14 +123,15 @@ const mockTournaments = [
    ============================================= */
 
 const state = {
-  view: 'admin',        // 'admin' | 'public'
+  view: 'admin',
   adminLoggedIn: false,
   adminSection: 'dashboard',
   publicSection: 'home',
   selectedTournamentId: 1,
   selectedCategoryId: 1,
+  editingTournamentId: null,
   tournaments: [...mockTournaments],
-  categories: [] // added via form
+  categories: []
 };
 
 /* =============================================
@@ -202,10 +203,12 @@ function adminLogout() {
    ============================================= */
 
 const sectionTitles = {
-  dashboard:       'Dashboard',
-  organizer:       'Dane M-ACTIVE',
-  tournaments:     'Turnieje',
-  'add-tournament':'Dodaj turniej'
+  dashboard:          'Dashboard',
+  organizer:          'Dane M-ACTIVE',
+  tournaments:        'Turnieje',
+  'add-tournament':   'Dodaj turniej',
+  'edit-tournament':  'Edytuj turniej',
+  settings:           'Ustawienia'
 };
 
 function showSection(name) {
@@ -299,12 +302,81 @@ function renderAdminTournamentList() {
       <td>${badgeHtml(t.status)}</td>
       <td>
         <div class="t-actions">
-          <button class="btn btn-secondary btn-sm" onclick="showToast('Edycja turnieju — funkcja dostępna wkrótce')">✏️ Edytuj</button>
+          <button class="btn btn-secondary btn-sm" onclick="editTournament(${t.id})">✏️ Edytuj</button>
           <button class="btn btn-ghost btn-sm" onclick="openPublicPreview(${t.id})">🌐 Podgląd</button>
           <button class="btn btn-ghost btn-sm" onclick="openPdfModal(${t.id})">📄 PDF</button>
         </div>
       </td>
     </tr>`).join('');
+}
+
+/* =============================================
+   ADMIN — Edit Tournament
+   ============================================= */
+
+let editCategories = [];
+
+function editTournament(id) {
+  const t = state.tournaments.find(t => t.id === id);
+  if (!t) return;
+  state.editingTournamentId = id;
+
+  document.getElementById('edit-tournament-name-banner').textContent = t.name;
+  document.getElementById('et-name').value      = t.name;
+  document.getElementById('et-desc').value      = t.shortDesc;
+  document.getElementById('et-start').value     = t.dateStart;
+  document.getElementById('et-end').value       = t.dateEnd;
+  document.getElementById('et-location').value  = t.location;
+  document.getElementById('et-status').value    = t.status;
+
+  editCategories = t.categories.map(c => c.name);
+  renderEditCategoryTags();
+  showSection('edit-tournament');
+}
+
+function addEditCategory() {
+  const input = document.getElementById('edit-new-category-input');
+  const val = input.value.trim();
+  if (!val || editCategories.includes(val)) return;
+  editCategories.push(val);
+  input.value = '';
+  renderEditCategoryTags();
+}
+
+function removeEditCategory(name) {
+  editCategories = editCategories.filter(c => c !== name);
+  renderEditCategoryTags();
+}
+
+function renderEditCategoryTags() {
+  document.getElementById('edit-category-tags').innerHTML = editCategories.map(c => `
+    <div class="category-tag">
+      ${c}
+      <button onclick="removeEditCategory('${c.replace(/'/g, "\\'")}')">×</button>
+    </div>`).join('');
+}
+
+function updateTournament() {
+  const id  = state.editingTournamentId;
+  const t   = state.tournaments.find(t => t.id === id);
+  if (!t) return;
+
+  t.name      = document.getElementById('et-name').value.trim() || t.name;
+  t.shortDesc = document.getElementById('et-desc').value || t.shortDesc;
+  t.dateStart = document.getElementById('et-start').value || t.dateStart;
+  t.dateEnd   = document.getElementById('et-end').value   || t.dateEnd;
+  t.location  = document.getElementById('et-location').value || t.location;
+  t.status    = document.getElementById('et-status').value;
+
+  // Merge categories — keep existing bracket data, add new ones
+  const existingMap = Object.fromEntries(t.categories.map(c => [c.name, c]));
+  t.categories = editCategories.map((name, i) =>
+    existingMap[name] || { id: 200 + i, name, players: 8, type: 'Drabinka', status: 'planned', bracket: null }
+  );
+
+  state.editingTournamentId = null;
+  showToast(`Turniej „${t.name}" został zaktualizowany.`);
+  showSection('tournaments');
 }
 
 /* =============================================
@@ -658,10 +730,34 @@ function buildBracketHTML(bData, compact) {
 
 function showPubSection(name) {
   state.publicSection = name;
-  const sections = { home: 'pub-home', detail: 'pub-detail', bracket: 'pub-bracket' };
+  const sections = {
+    home:    'pub-home',
+    detail:  'pub-detail',
+    bracket: 'pub-bracket',
+    about:   'pub-about',
+    contact: 'pub-contact'
+  };
   Object.values(sections).forEach(id => document.getElementById(id).classList.add('hidden'));
   if (sections[name]) document.getElementById(sections[name]).classList.remove('hidden');
+
+  // Update nav active state
+  document.querySelectorAll('.pub-nav-link').forEach(b => b.classList.remove('active'));
+  if (name === 'home')    document.querySelector('.pub-nav-link:first-child')?.classList.add('active');
+  if (name === 'about')   document.getElementById('nav-about')?.classList.add('active');
+  if (name === 'contact') document.getElementById('nav-contact')?.classList.add('active');
+
   window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function showPublicPage(name) {
+  showPubSection(name);
+}
+
+function sendContactForm() {
+  const name = document.getElementById('contact-name').value.trim();
+  if (!name) { showToast('Podaj imię i nazwisko'); return; }
+  showToast('Wiadomość wysłana! Odpiszemy wkrótce.');
+  ['contact-name','contact-email','contact-msg'].forEach(id => { document.getElementById(id).value = ''; });
 }
 
 /* =============================================
