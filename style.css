@@ -1246,7 +1246,7 @@ textarea.form-input { resize: vertical; min-height: 100px; }
 
 .pdf-topbar {
   width: 100%;
-  max-width: 820px;
+  max-width: 1100px;
   display: flex;
   align-items: center;
   gap: 12px;
@@ -1263,7 +1263,7 @@ textarea.form-input { resize: vertical; min-height: 100px; }
 
 .pdf-pages {
   width: 100%;
-  max-width: 820px;
+  max-width: 1100px;
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -1275,7 +1275,12 @@ textarea.form-input { resize: vertical; min-height: 100px; }
   box-shadow: 0 4px 24px rgba(0,0,0,0.4);
   padding: 60px 72px;
   min-height: 1100px;
+  max-width: 820px;
   position: relative;
+}
+
+.pdf-page.pdf-page-landscape {
+  max-width: none;
 }
 
 .pdf-page-number {
@@ -1421,17 +1426,20 @@ textarea.form-input { resize: vertical; min-height: 100px; }
 
 /* PDF Landscape bracket pages */
 .pdf-page-landscape {
-  max-width: 1100px;
-  min-height: auto;
-  padding: 40px 60px;
+  width: 1060px;
+  min-height: 750px;
+  max-width: none;
+  padding: 36px 52px;
+  box-sizing: border-box;
 }
 
 .pdf-page-landscape .pdf-bracket {
-  height: 440px;
+  height: 560px;
+  flex: 1;
 }
 
 .pdf-page-landscape .pdf-bracket .bracket-round {
-  width: 200px;
+  width: 210px;
 }
 
 /* Public info pages */
