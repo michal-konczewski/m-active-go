@@ -17,71 +17,75 @@ const mockOrganizer = {
 };
 
 /* ---- Bracket data helpers ---- */
-function mkMatch(idSuffix, round, pAname, pAseed, pBname, pBseed, sA1, sA2, sA3, sB1, sB2, sB3, tbA1, tbA2, tbA3, tbB1, tbB2, tbB3, winner) {
+function mkMatch(id, round, pAname, pAseed, pBname, pBseed, s1a, s1b, s2a, s2b, s3a, s3b, tb1, tb2, tb3, winner) {
   return {
-    id: 'match-' + idSuffix,
+    id,
     round,
-    status: (sA1 !== null || sB1 !== null) ? 'finished' : 'pending',
+    status: (s1a !== null || s1b !== null) ? 'finished' : 'pending',
     playerA: { name: pAname, seed: pAseed },
     playerB: { name: pBname, seed: pBseed },
-    score: {
-      playerA: [
-        { games: sA1, tiebreak: tbA1 ?? null },
-        { games: sA2, tiebreak: tbA2 ?? null },
-        { games: sA3, tiebreak: tbA3 ?? null },
-      ],
-      playerB: [
-        { games: sB1, tiebreak: tbB1 ?? null },
-        { games: sB2, tiebreak: tbB2 ?? null },
-        { games: sB3, tiebreak: tbB3 ?? null },
-      ]
-    },
-    winner // 'playerA' | 'playerB' | null
+    score: [
+      { playerAGames: s1a ?? null, playerBGames: s1b ?? null, tieBreakSmallPoints: tb1 ?? null },
+      { playerAGames: s2a ?? null, playerBGames: s2b ?? null, tieBreakSmallPoints: tb2 ?? null },
+      { playerAGames: s3a ?? null, playerBGames: s3b ?? null, tieBreakSmallPoints: tb3 ?? null },
+    ],
+    winner: winner || null
   };
+}
+
+function formatSetScore(playerAGames, playerBGames, tieBreakSmallPoints, forPlayerA) {
+  const games = forPlayerA ? playerAGames : playerBGames;
+  const opGames = forPlayerA ? playerBGames : playerAGames;
+  if (games === null || games === undefined) return '.';
+  const isTieBreakWinner = (games === 7 && opGames === 6);
+  if (isTieBreakWinner && tieBreakSmallPoints !== null) {
+    return `${games}<sup>${tieBreakSmallPoints}</sup>`;
+  }
+  return String(games);
 }
 
 const womenDoublesBracket = {
   r1: [
-    mkMatch('w-r1-1','Runda 1','Kowalska / Wiśniewska',1,'Nowakowska / Dąbrowska',null, 6,6,null, 4,2,null, null,null,null,null,null,null,'playerA'),
-    mkMatch('w-r1-2','Runda 1','Kamińska / Wójcik',3,'Lewandowska / Zielińska',null, 7,6,null, 5,3,null, null,null,null,null,null,null,'playerA'),
-    mkMatch('w-r1-3','Runda 1','Szymańska / Woźniak',2,'Kozłowska / Jankowska',null, 6,6,null, 1,4,null, null,null,null,null,null,null,'playerA'),
-    mkMatch('w-r1-4','Runda 1','Malinowska / Piotrowska',4,'Kwiatkowska / Adamska',null, 4,6,6, 6,3,4, null,null,null,null,null,null,'playerA'),
+    mkMatch('w-r1-1','Runda 1','Kowalska / Wiśniewska',1,'Nowakowska / Dąbrowska',null, 6,4, 6,2, null,null, null,null,null,'playerA'),
+    mkMatch('w-r1-2','Runda 1','Kamińska / Wójcik',3,'Lewandowska / Zielińska',null, 7,6, 6,3, null,null, 4,null,null,'playerA'),
+    mkMatch('w-r1-3','Runda 1','Szymańska / Woźniak',2,'Kozłowska / Jankowska',null, 6,1, 6,4, null,null, null,null,null,'playerA'),
+    mkMatch('w-r1-4','Runda 1','Malinowska / Piotrowska',4,'Kwiatkowska / Adamska',null, 4,6, 6,3, 6,4, null,null,null,'playerA'),
   ],
   sf: [
-    mkMatch('w-sf-1','Półfinał','Kowalska / Wiśniewska',1,'Kamińska / Wójcik',3, 6,7,null, 3,6,null, null,6,null,null,4,null,'playerA'),
-    mkMatch('w-sf-2','Półfinał','Szymańska / Woźniak',2,'Malinowska / Piotrowska',4, 6,6,null, 2,4,null, null,null,null,null,null,null,'playerA'),
+    mkMatch('w-sf-1','Półfinał','Kowalska / Wiśniewska',1,'Kamińska / Wójcik',3, 6,3, 7,6, null,null, null,4,null,'playerA'),
+    mkMatch('w-sf-2','Półfinał','Szymańska / Woźniak',2,'Malinowska / Piotrowska',4, 6,2, 6,4, null,null, null,null,null,'playerA'),
   ],
-  final: mkMatch('w-f','Finał','Kowalska / Wiśniewska',1,'Szymańska / Woźniak',2, 7,6,null, 5,4,null, null,null,null,null,null,null,'playerA'),
+  final: mkMatch('w-f','Finał','Kowalska / Wiśniewska',1,'Szymańska / Woźniak',2, 7,5, 6,4, null,null, 3,null,null,'playerA'),
   winner: 'Kowalska / Wiśniewska'
 };
 
 const menSinglesBracket = {
   r1: [
-    mkMatch('m-r1-1','Runda 1','Nowak Adam',1,'Kowalski Jan',null, 6,7,null, 3,5,null, null,null,null,null,null,null,'playerA'),
-    mkMatch('m-r1-2','Runda 1','Wiśniewski P.',3,'Dąbrowski M.',null, 6,6,null, 4,2,null, null,null,null,null,null,null,'playerA'),
-    mkMatch('m-r1-3','Runda 1','Kaczmarek R.',2,'Lewandowski K.',null, 7,4,6, 6,6,3, 6,null,null,7,null,null,'playerA'),
-    mkMatch('m-r1-4','Runda 1','Zieliński T.',4,'Szymański B.',null, 6,6,null, 1,3,null, null,null,null,null,null,null,'playerA'),
+    mkMatch('m-r1-1','Runda 1','Nowak Adam',1,'Kowalski Jan',null, 6,3, 7,5, null,null, null,null,null,'playerA'),
+    mkMatch('m-r1-2','Runda 1','Wiśniewski P.',3,'Dąbrowski M.',null, 6,4, 6,2, null,null, null,null,null,'playerA'),
+    mkMatch('m-r1-3','Runda 1','Kaczmarek R.',2,'Lewandowski K.',null, 7,6, 4,6, 6,3, 6,null,null,'playerA'),
+    mkMatch('m-r1-4','Runda 1','Zieliński T.',4,'Szymański B.',null, 6,1, 6,3, null,null, null,null,null,'playerA'),
   ],
   sf: [
-    mkMatch('m-sf-1','Półfinał','Nowak Adam',1,'Wiśniewski P.',3, 6,6,null, 4,3,null, null,null,null,null,null,null,'playerA'),
-    mkMatch('m-sf-2','Półfinał','Kaczmarek R.',2,'Zieliński T.',4, 7,6,null, 5,4,null, null,null,null,null,null,null,'playerA'),
+    mkMatch('m-sf-1','Półfinał','Nowak Adam',1,'Wiśniewski P.',3, 6,4, 6,3, null,null, null,null,null,'playerA'),
+    mkMatch('m-sf-2','Półfinał','Kaczmarek R.',2,'Zieliński T.',4, 7,6, 5,4, null,null, 4,null,null,'playerA'),
   ],
-  final: mkMatch('m-f','Finał','Nowak Adam',1,'Kaczmarek R.',2, 6,7,null, 4,6,null, null,6,null,null,4,null,'playerA'),
+  final: mkMatch('m-f','Finał','Nowak Adam',1,'Kaczmarek R.',2, 6,4, 7,6, null,null, null,3,null,'playerA'),
   winner: 'Nowak Adam'
 };
 
 const mixedOpenBracket = {
   r1: [
-    mkMatch('x-r1-1','Runda 1','Nowak / Kamińska',1,'Kowalski / Wójcik',null, 6,6,null, 2,3,null, null,null,null,null,null,null,'playerA'),
-    mkMatch('x-r1-2','Runda 1','Wiśniewski / Nowakowska',3,'Dąbrowski / Zielińska',null, 7,6,null, 5,4,null, null,null,null,null,null,null,'playerA'),
-    mkMatch('x-r1-3','Runda 1','Kaczmarek / Szymańska',2,'Lewandowski / Kozłowska',null, 6,6,null, 3,1,null, null,null,null,null,null,null,'playerA'),
-    mkMatch('x-r1-4','Runda 1','Zieliński / Malinowska',4,'Piotrowski / Kwiatkowska',null, null,null,null, null,null,null, null,null,null,null,null,null,'playerA'),
+    mkMatch('x-r1-1','Runda 1','Nowak / Kamińska',1,'Kowalski / Wójcik',null, 6,2, 6,3, null,null, null,null,null,'playerA'),
+    mkMatch('x-r1-2','Runda 1','Wiśniewski / Nowakowska',3,'Dąbrowski / Zielińska',null, 7,6, 5,4, null,null, 5,null,null,'playerA'),
+    mkMatch('x-r1-3','Runda 1','Kaczmarek / Szymańska',2,'Lewandowski / Kozłowska',null, 6,3, 6,1, null,null, null,null,null,'playerA'),
+    mkMatch('x-r1-4','Runda 1','Zieliński / Malinowska',4,'Piotrowski / Kwiatkowska',null, null,null, null,null, null,null, null,null,null,null),
   ],
   sf: [
-    mkMatch('x-sf-1','Półfinał','Nowak / Kamińska',1,'Wiśniewski / Nowakowska',3, 6,7,null, 4,6,null, null,6,null,null,4,null,'playerA'),
-    mkMatch('x-sf-2','Półfinał','Kaczmarek / Szymańska',2,'Zieliński / Malinowska',4, 6,6,null, 2,3,null, null,null,null,null,null,null,'playerA'),
+    mkMatch('x-sf-1','Półfinał','Nowak / Kamińska',1,'Wiśniewski / Nowakowska',3, 6,4, 7,6, null,null, null,4,null,'playerA'),
+    mkMatch('x-sf-2','Półfinał','Kaczmarek / Szymańska',2,'Zieliński / Malinowska',4, 6,2, 6,3, null,null, null,null,null,'playerA'),
   ],
-  final: mkMatch('x-f','Finał','Nowak / Kamińska',1,'Kaczmarek / Szymańska',2, 7,4,6, 6,6,4, 6,null,null,4,null,null,'playerA'),
+  final: mkMatch('x-f','Finał','Nowak / Kamińska',1,'Kaczmarek / Szymańska',2, 7,6, 4,6, 6,4, 3,null,null,'playerA'),
   winner: 'Nowak / Kamińska'
 };
 
@@ -676,182 +680,224 @@ function showBracket(tournamentId, categoryId) {
     <div class="brl-item conn"></div>
     <div class="brl-item r2">Półfinał</div>
     <div class="brl-item conn"></div>
-    <div class="brl-item r3">Finał</div>
-    <div class="brl-item winner">Zwycięzca</div>`;
+    <div class="brl-item r3">Finał</div>`;
 
   bracketArea.innerHTML = buildBracketHTML(cat.bracket, false);
+  requestAnimationFrame(() => initBracketConnectors(bracketArea));
+}
+
+/* =============================================
+   BRACKET — Connector Lines (SVG, post-render)
+   ============================================= */
+
+function initBracketConnectors(container) {
+  const conns = container.querySelectorAll('.bracket-conn');
+  conns.forEach(conn => {
+    const prevRound = conn.previousElementSibling;
+    const nextRound = conn.nextElementSibling;
+    if (!prevRound || !nextRound) return;
+
+    const connRect = conn.getBoundingClientRect();
+    const prevMatches = prevRound.querySelectorAll('.b-match');
+    const nextMatches = nextRound.querySelectorAll('.b-match');
+    if (!prevMatches.length || !nextMatches.length) return;
+
+    const W = connRect.width || 28;
+    const H = connRect.height || 400;
+    const stroke = 'rgba(108,192,48,0.45)';
+    const mid = W / 2;
+
+    const getCenter = (el) => {
+      const r = el.getBoundingClientRect();
+      return r.top + r.height / 2 - connRect.top;
+    };
+
+    const prevCenters = Array.from(prevMatches).map(getCenter);
+    const nextCenters = Array.from(nextMatches).map(getCenter);
+
+    const lines = [];
+    nextCenters.forEach((dst, j) => {
+      const src1 = prevCenters[j * 2];
+      const src2 = prevCenters[j * 2 + 1];
+      if (src1 !== undefined) lines.push(`<line x1="0" y1="${src1.toFixed(1)}" x2="${mid}" y2="${src1.toFixed(1)}" stroke="${stroke}" stroke-width="1.5"/>`);
+      if (src2 !== undefined) lines.push(`<line x1="0" y1="${src2.toFixed(1)}" x2="${mid}" y2="${src2.toFixed(1)}" stroke="${stroke}" stroke-width="1.5"/>`);
+      if (src1 !== undefined && src2 !== undefined) {
+        lines.push(`<line x1="${mid}" y1="${src1.toFixed(1)}" x2="${mid}" y2="${src2.toFixed(1)}" stroke="${stroke}" stroke-width="1.5"/>`);
+      }
+      lines.push(`<line x1="${mid}" y1="${dst.toFixed(1)}" x2="${W}" y2="${dst.toFixed(1)}" stroke="${stroke}" stroke-width="1.5"/>`);
+    });
+
+    conn.style.position = 'relative';
+    conn.innerHTML = `<svg style="position:absolute;top:0;left:0;width:${W}px;height:${H}px;overflow:visible" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">${lines.join('')}</svg>`;
+  });
 }
 
 /* =============================================
    BRACKET HTML BUILDER
    ============================================= */
 
-function buildBracketHTML(bData, compact, adminMode) {
-  const h  = compact ? 520 : 600;
-  const mw = compact ? 260 : 300;
-  const cw = 50;
+function buildMatchCardHTML(match, isAdmin) {
+  if (!match) return '';
+  const aWins = match.winner === 'playerA';
+  const bWins = match.winner === 'playerB';
 
-  const r1 = [h/8, h*3/8, h*5/8, h*7/8];
-  const r2 = [h/4, h*3/4];
-  const r3 = h/2;
+  const renderScoreCells = (forPlayerA) =>
+    match.score.map((s, i) => {
+      const games = forPlayerA ? s.playerAGames : s.playerBGames;
+      const opGames = forPlayerA ? s.playerBGames : s.playerAGames;
+      if (isAdmin) {
+        const isTb = (s.playerAGames === 7 && s.playerBGames === 6) || (s.playerAGames === 6 && s.playerBGames === 7);
+        const side = forPlayerA ? 'playerA' : 'playerB';
+        return `<div class="score-cell-wrap">
+          <input class="score-input" type="number" min="0" max="7"
+            value="${games !== null ? games : ''}" placeholder="–"
+            data-match="${match.id}" data-side="${side}" data-set="${i}"
+            oninput="handleScoreInput(this)"/>
+          ${isTb ? `<input class="tb-input" type="number" min="0" max="99"
+            value="${s.tieBreakSmallPoints !== null ? s.tieBreakSmallPoints : ''}" placeholder="tb"
+            data-match="${match.id}" data-side="tb" data-set="${i}"
+            oninput="handleTbInput(this)" title="Małe punkty tie-breaka"/>` : '<span class="tb-spacer"></span>'}
+        </div>`;
+      }
+      if (games === null) return `<span class="score-cell muted">.</span>`;
+      const formatted = formatSetScore(s.playerAGames, s.playerBGames, s.tieBreakSmallPoints, forPlayerA);
+      return `<span class="score-cell">${formatted}</span>`;
+    }).join('');
 
-  const scoreCell = (set, isAdmin, matchId, side, setIdx) => {
-    const val = set.games;
-    const tb  = set.tiebreak;
-    if (isAdmin) {
-      return `<div class="score-cell-wrap">
-        <input class="score-input" type="number" min="0" max="7"
-          value="${val !== null ? val : ''}" placeholder="–"
-          data-match="${matchId}" data-side="${side}" data-set="${setIdx}"
-          onchange="updateMatchScore(this)"/>
-        <input class="tb-input" type="number" min="0" max="99"
-          value="${tb !== null ? tb : ''}" placeholder=""
-          data-match="${matchId}" data-side="${side}" data-set="${setIdx}" data-tb="1"
-          onchange="updateMatchScore(this)"/>
-      </div>`;
-    }
-    if (val === null) return `<span class="score-cell muted">.</span>`;
-    return `<span class="score-cell">${val}${tb !== null ? `<sup>${tb}</sup>` : ''}</span>`;
-  };
+  const rowA = `
+    <div class="match-row ${aWins ? 'is-winner' : ''}">
+      <div class="player-info">
+        ${aWins ? '<span class="winner-badge">W</span>' : '<span class="winner-badge-placeholder"></span>'}
+        ${match.playerA.seed ? `<span class="player-seed">${match.playerA.seed}</span>` : ''}
+        <span class="player-name">${match.playerA.name}</span>
+      </div>
+      <div class="score-grid">${renderScoreCells(true)}</div>
+    </div>`;
 
-  const matchCard = (match) => {
-    if (!match) return `<div style="height:88px"></div>`;
-    const aWins = match.winner === 'playerA';
-    const bWins = match.winner === 'playerB';
-    const isAdmin = !!adminMode;
-    const pending = match.status === 'pending';
+  const rowB = `
+    <div class="match-row ${bWins ? 'is-winner' : ''}">
+      <div class="player-info">
+        ${bWins ? '<span class="winner-badge">W</span>' : '<span class="winner-badge-placeholder"></span>'}
+        ${match.playerB.seed ? `<span class="player-seed">${match.playerB.seed}</span>` : ''}
+        <span class="player-name">${match.playerB.name}</span>
+      </div>
+      <div class="score-grid">${renderScoreCells(false)}</div>
+    </div>`;
 
-    const rowA = `
-      <div class="match-row ${aWins ? 'is-winner' : ''}">
-        <div class="player-info">
-          ${aWins ? '<span class="winner-badge">W</span>' : '<span class="winner-badge-placeholder"></span>'}
-          ${match.playerA.seed ? `<span class="player-seed">${match.playerA.seed}</span>` : ''}
-          <span class="player-name">${match.playerA.name}</span>
-        </div>
-        <div class="score-grid">
-          ${match.score.playerA.map((s,i) => scoreCell(s, isAdmin, match.id, 'playerA', i)).join('')}
-        </div>
-      </div>`;
-
-    const rowB = `
-      <div class="match-row ${bWins ? 'is-winner' : ''}">
-        <div class="player-info">
-          ${bWins ? '<span class="winner-badge">W</span>' : '<span class="winner-badge-placeholder"></span>'}
-          ${match.playerB.seed ? `<span class="player-seed">${match.playerB.seed}</span>` : ''}
-          <span class="player-name">${match.playerB.name}</span>
-        </div>
-        <div class="score-grid">
-          ${match.score.playerB.map((s,i) => scoreCell(s, isAdmin, match.id, 'playerB', i)).join('')}
-        </div>
-      </div>`;
-
-    const winnerSelect = isAdmin ? `
-      <div class="winner-select-row">
-        <select class="form-input winner-select-input" onchange="setMatchWinner('${match.id}', this.value)">
-          <option value="">— Zwycięzca —</option>
-          <option value="playerA" ${match.winner==='playerA'?'selected':''}>✓ ${match.playerA.name}</option>
-          <option value="playerB" ${match.winner==='playerB'?'selected':''}>✓ ${match.playerB.name}</option>
-        </select>
-      </div>` : '';
-
-    return `
-      <div class="b-match is-${match.status}" data-match-id="${match.id}">
-        ${rowA}
-        <div class="match-divider"></div>
-        ${rowB}
-        ${winnerSelect}
-      </div>`;
-  };
-
-  const connColor = 'rgba(108,192,48,0.35)';
-  const connSVG1 = `
-    <svg viewBox="0 0 ${cw} ${h}" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-      <line x1="0" y1="${r1[0]}" x2="${cw/2}" y2="${r1[0]}" stroke="${connColor}" stroke-width="1.5"/>
-      <line x1="0" y1="${r1[1]}" x2="${cw/2}" y2="${r1[1]}" stroke="${connColor}" stroke-width="1.5"/>
-      <line x1="${cw/2}" y1="${r1[0]}" x2="${cw/2}" y2="${r1[1]}" stroke="${connColor}" stroke-width="1.5"/>
-      <line x1="${cw/2}" y1="${r2[0]}" x2="${cw}" y2="${r2[0]}" stroke="${connColor}" stroke-width="1.5"/>
-      <line x1="0" y1="${r1[2]}" x2="${cw/2}" y2="${r1[2]}" stroke="${connColor}" stroke-width="1.5"/>
-      <line x1="0" y1="${r1[3]}" x2="${cw/2}" y2="${r1[3]}" stroke="${connColor}" stroke-width="1.5"/>
-      <line x1="${cw/2}" y1="${r1[2]}" x2="${cw/2}" y2="${r1[3]}" stroke="${connColor}" stroke-width="1.5"/>
-      <line x1="${cw/2}" y1="${r2[1]}" x2="${cw}" y2="${r2[1]}" stroke="${connColor}" stroke-width="1.5"/>
-    </svg>`;
-
-  const connSVG2 = `
-    <svg viewBox="0 0 ${cw} ${h}" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-      <line x1="0" y1="${r2[0]}" x2="${cw/2}" y2="${r2[0]}" stroke="${connColor}" stroke-width="1.5"/>
-      <line x1="0" y1="${r2[1]}" x2="${cw/2}" y2="${r2[1]}" stroke="${connColor}" stroke-width="1.5"/>
-      <line x1="${cw/2}" y1="${r2[0]}" x2="${cw/2}" y2="${r2[1]}" stroke="${connColor}" stroke-width="1.5"/>
-      <line x1="${cw/2}" y1="${r3}" x2="${cw}" y2="${r3}" stroke="${connColor}" stroke-width="1.5"/>
-    </svg>`;
+  const winnerSelect = isAdmin ? `
+    <div class="winner-select-row">
+      <select class="form-input winner-select-input" onchange="setMatchWinner('${match.id}', this.value)">
+        <option value="">— Zwycięzca —</option>
+        <option value="playerA" ${match.winner==='playerA'?'selected':''}>✓ ${match.playerA.name}</option>
+        <option value="playerB" ${match.winner==='playerB'?'selected':''}>✓ ${match.playerB.name}</option>
+      </select>
+    </div>` : '';
 
   return `
-    <div class="bracket-round" style="width:${mw}px;height:${h}px">
-      ${bData.r1.map(m => matchCard(m)).join('')}
-    </div>
-    <div class="bracket-connector" style="width:${cw}px;height:${h}px">${connSVG1}</div>
-    <div class="bracket-round" style="width:${mw}px;height:${h}px">
-      ${bData.sf.map(m => matchCard(m)).join('')}
-    </div>
-    <div class="bracket-connector" style="width:${cw}px;height:${h}px">${connSVG2}</div>
-    <div class="bracket-round" style="width:${mw}px;height:${h}px">
-      ${matchCard(bData.final)}
-    </div>
-    <div class="bracket-winner-box">
-      <div class="winner-trophy">🏆</div>
-      <div class="winner-label">Zwycięzca</div>
-      <div class="winner-name">${bData.winner}</div>
+    <div class="b-match is-${match.status}" data-match-id="${match.id}">
+      ${rowA}
+      <div class="match-divider"></div>
+      ${rowB}
+      ${winnerSelect}
     </div>`;
+}
+
+function buildBracketHTML(bData, compact, adminMode) {
+  const matchCard = (match) => {
+    if (!match) return `<div class="b-match-placeholder"></div>`;
+    return buildMatchCardHTML(match, !!adminMode);
+  };
+
+  const rounds = bData.r1 ? (bData.r2 ? [bData.r1, bData.r2, bData.qf, bData.sf, [bData.final]] : [bData.r1, bData.sf, [bData.final]]) : [[bData.final]];
+  const filteredRounds = rounds.filter(Boolean);
+
+  const renderRounds = () => {
+    const parts = [];
+    for (let ri = 0; ri < filteredRounds.length; ri++) {
+      const rnd = filteredRounds[ri];
+      parts.push(`<div class="bracket-round" data-matches="${rnd.length}">${rnd.map(m => matchCard(m)).join('')}</div>`);
+      if (ri < filteredRounds.length - 1) {
+        parts.push(`<div class="bracket-conn" data-from="${rnd.length}" data-to="${filteredRounds[ri+1].length}"></div>`);
+      }
+    }
+    return parts.join('');
+  };
+
+  return `<div class="bracket-flex${compact ? ' bracket-compact' : ''}">${renderRounds()}</div>`;
 }
 
 // Znajdź mecz po ID we wszystkich drabinkach
 function findMatchById(matchId) {
-  const brackets = [womenDoublesBracket, menSinglesBracket, mixedOpenBracket];
-  // Also search in tournament categories
+  const seen = new Set();
+  const brackets = [];
+  [womenDoublesBracket, menSinglesBracket, mixedOpenBracket].forEach(b => brackets.push(b));
   state.tournaments.forEach(t => t.categories.forEach(c => {
-    if (c.bracket) brackets.push(c.bracket);
+    if (c.bracket && !seen.has(c.bracket)) { seen.add(c.bracket); brackets.push(c.bracket); }
   }));
   for (const b of brackets) {
-    const allMatches = [...(b.r1||[]), ...(b.sf||[]), b.final].filter(Boolean);
-    const found = allMatches.find(m => m.id === matchId);
+    const all = [...(b.r1||[]), ...(b.r2||[]), ...(b.qf||[]), ...(b.sf||[]), b.final].filter(Boolean);
+    const found = all.find(m => m && m.id === matchId);
     if (found) return found;
   }
   return null;
 }
 
-function updateMatchScore(input) {
+function handleScoreInput(input) {
   const matchId = input.dataset.match;
   const side    = input.dataset.side;   // 'playerA' | 'playerB'
   const setIdx  = parseInt(input.dataset.set);
-  const isTb    = !!input.dataset.tb;
   const val     = input.value === '' ? null : parseInt(input.value);
 
   const match = findMatchById(matchId);
   if (!match) return;
 
-  if (isTb) {
-    match.score[side][setIdx].tiebreak = val;
-  } else {
-    match.score[side][setIdx].games = val;
-  }
+  if (side === 'playerA') match.score[setIdx].playerAGames = val;
+  else match.score[setIdx].playerBGames = val;
   match.status = 'finished';
-  showToast('Wynik meczu został zaktualizowany');
+
+  // Check if we need to show/hide TB input
+  const s = match.score[setIdx];
+  const isTb = (s.playerAGames === 7 && s.playerBGames === 6) || (s.playerAGames === 6 && s.playerBGames === 7);
+  if (!isTb) s.tieBreakSmallPoints = null;
+
+  // Re-render the match card inline
+  rerenderMatch(matchId);
+  showToast('Wynik zaktualizowany');
+}
+
+function handleTbInput(input) {
+  const matchId = input.dataset.match;
+  const setIdx  = parseInt(input.dataset.set);
+  const val     = input.value === '' ? null : parseInt(input.value);
+
+  const match = findMatchById(matchId);
+  if (!match) return;
+  match.score[setIdx].tieBreakSmallPoints = val;
+  showToast('Tie-break zaktualizowany');
+}
+
+function rerenderMatch(matchId) {
+  const els = document.querySelectorAll(`[data-match-id="${matchId}"]`);
+  els.forEach(el => {
+    const match = findMatchById(matchId);
+    if (!match) return;
+    const isAdmin = el.querySelector('.score-input') !== null;
+    const tmp = document.createElement('div');
+    tmp.innerHTML = buildMatchCardHTML(match, isAdmin);
+    el.replaceWith(tmp.firstElementChild);
+  });
 }
 
 function setMatchWinner(matchId, winner) {
   const match = findMatchById(matchId);
   if (!match) return;
   match.winner = winner || null;
-  showToast('Zwycięzca meczu został zapisany');
-  // Re-render current bracket if visible
-  const bracketArea = document.getElementById('bracket-scroll');
-  if (bracketArea && !bracketArea.closest('.hidden')) {
-    const catId = state.selectedCategoryId;
-    const tournament = state.tournaments.find(t => t.id === state.selectedTournamentId);
-    const cat = tournament?.categories.find(c => c.id === catId);
-    if (cat?.bracket) {
-      bracketArea.innerHTML = buildBracketHTML(cat.bracket, false, false);
-    }
-  }
+  showToast('Zwycięzca zapisany');
+  rerenderMatch(matchId);
+}
+
+function updateMatchScore(input) {
+  handleScoreInput(input);
 }
 
 /* =============================================

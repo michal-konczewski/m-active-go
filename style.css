@@ -1196,77 +1196,70 @@ textarea.form-input { resize: vertical; min-height: 100px; }
 .cat-pill:hover { border-color: var(--accent-mid); color: var(--text); }
 .cat-pill.active { background: var(--accent); border-color: var(--accent); color: #fff; }
 
-/* Bracket visualization */
+/* =============================================
+   BRACKET — Layout (flex, no fixed heights)
+   ============================================= */
+
 .bracket-container {
   background: var(--glass);
   backdrop-filter: var(--glass-blur);
   -webkit-backdrop-filter: var(--glass-blur);
-  border: 1px solid var(--glass-border);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow-sm);
-  padding: 28px;
-  overflow-x: auto;
+  border: 1.5px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  overflow: auto;
 }
 
-.bracket-scroll {
+.bracket-flex {
   display: flex;
+  flex-direction: row;
   align-items: stretch;
-  height: 560px;
-  min-width: 900px;
   gap: 0;
+  min-width: max-content;
 }
 
+/* Each round column */
 .bracket-round {
   display: flex;
   flex-direction: column;
   justify-content: space-around;
-  height: 100%;
-  flex-shrink: 0;
+  min-width: 220px;
+  max-width: 280px;
+  flex: 1;
+  gap: 6px;
+  padding: 4px 0;
 }
 
-.bracket-round-r1 { width: 220px; }
-.bracket-round-r2 { width: 220px; }
-.bracket-round-r3 { width: 220px; }
+/* Compact variant for 32-player brackets */
+.bracket-compact .bracket-round {
+  min-width: 160px;
+  max-width: 220px;
+  gap: 3px;
+}
 
-.bracket-connector {
+/* Connector column between rounds */
+.bracket-conn {
+  width: 28px;
   flex-shrink: 0;
   position: relative;
-  height: 100%;
+  background: transparent;
 }
 
-.bracket-connector svg {
+/* Connector lines drawn with JS via SVG or CSS borders */
+.bracket-conn::before,
+.bracket-conn::after {
+  content: '';
   position: absolute;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
+  background: rgba(108,192,48,0.35);
 }
 
-/* Round labels row above bracket */
-.bracket-round-labels {
-  display: flex;
-  align-items: center;
-  height: 36px;
-  margin-bottom: 8px;
-  min-width: 900px;
+/* Placeholder for empty match slots */
+.b-match-placeholder {
+  flex: 1;
 }
-
-.brl-item {
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.6px;
-  color: var(--text-muted);
-  text-align: center;
-  flex-shrink: 0;
-}
-
-.brl-item.r1 { width: 220px; }
-.brl-item.r2 { width: 220px; }
-.brl-item.r3 { width: 220px; }
-.brl-item.conn { width: 60px; }
-.brl-item.winner { flex: 1; min-width: 160px; }
 
 /* =============================================
-   BRACKET — Match Card (WTA-style scores)
+   BRACKET — Match Card
    ============================================= */
 
 .b-match {
@@ -1276,24 +1269,28 @@ textarea.form-input { resize: vertical; min-height: 100px; }
   border: 1.5px solid var(--glass-border);
   border-radius: 10px;
   overflow: hidden;
-  flex-shrink: 0;
   display: flex;
   flex-direction: column;
+  box-shadow: var(--shadow-sm);
 }
 
-.b-match.is-pending { opacity: 0.7; }
+.b-match.is-pending {
+  opacity: 0.65;
+}
 
 .match-divider {
   height: 1px;
   background: var(--border);
+  flex-shrink: 0;
 }
 
 .match-row {
   display: grid;
   grid-template-columns: 1fr auto;
   align-items: center;
-  gap: 8px;
-  padding: 7px 10px;
+  gap: 6px;
+  padding: 6px 8px;
+  min-height: 26px;
   transition: background 0.15s;
 }
 
@@ -1308,41 +1305,42 @@ body.dark .match-row.is-winner {
 .player-info {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 3px;
   min-width: 0;
   overflow: hidden;
 }
 
 .winner-badge {
   flex-shrink: 0;
-  font-size: 9px;
+  font-size: 8px;
   font-weight: 800;
   background: var(--accent);
   color: #fff;
   border-radius: 999px;
-  padding: 2px 5px;
-  line-height: 1.2;
+  padding: 1px 4px;
+  line-height: 1.3;
   letter-spacing: 0.3px;
 }
 
 .winner-badge-placeholder {
   flex-shrink: 0;
-  width: 21px;
+  width: 18px;
+  display: inline-block;
 }
 
 .player-seed {
   flex-shrink: 0;
-  font-size: 10px;
+  font-size: 9px;
   font-weight: 700;
   color: var(--accent-dark);
   background: var(--accent-light);
-  border-radius: 4px;
-  padding: 1px 5px;
+  border-radius: 3px;
+  padding: 1px 4px;
   line-height: 1.4;
 }
 
 .player-name {
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 600;
   color: var(--text);
   white-space: nowrap;
@@ -1357,39 +1355,47 @@ body.dark .match-row.is-winner {
 }
 
 body.dark .match-row.is-winner .player-name {
-  color: var(--accent);
+  color: #8EDB4A;
 }
 
-/* Score columns */
+/* =============================================
+   BRACKET — Score Grid
+   ============================================= */
+
 .score-grid {
   display: grid;
-  grid-template-columns: repeat(3, 28px);
-  gap: 3px;
+  grid-template-columns: repeat(3, 22px);
+  gap: 2px;
   flex-shrink: 0;
 }
 
 .score-cell {
   text-align: center;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
   line-height: 1;
-  padding: 2px 0;
+  padding: 1px 0;
 }
 
 .score-cell.muted {
   color: var(--text-light);
   font-weight: 400;
+  opacity: 0.5;
 }
 
 .score-cell sup {
-  font-size: 8px;
+  font-size: 7px;
   line-height: 0;
   margin-left: 1px;
   font-weight: 600;
+  vertical-align: super;
 }
 
-/* Admin score inputs */
+/* =============================================
+   BRACKET — Admin Score Inputs
+   ============================================= */
+
 .score-cell-wrap {
   display: flex;
   flex-direction: column;
@@ -1398,13 +1404,13 @@ body.dark .match-row.is-winner .player-name {
 }
 
 .score-input {
-  width: 26px;
-  height: 24px;
+  width: 24px;
+  height: 22px;
   text-align: center;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
   border: 1px solid var(--border-strong);
-  border-radius: 4px;
+  border-radius: 3px;
   background: rgba(255,255,255,0.5);
   color: var(--text);
   padding: 0;
@@ -1415,13 +1421,13 @@ body.dark .match-row.is-winner .player-name {
 .score-input::-webkit-inner-spin-button { -webkit-appearance: none; }
 
 .tb-input {
-  width: 26px;
-  height: 16px;
+  width: 24px;
+  height: 14px;
   text-align: center;
-  font-size: 9px;
-  border: 1px solid var(--border);
-  border-radius: 3px;
-  background: rgba(255,255,255,0.3);
+  font-size: 8px;
+  border: 1px solid var(--accent-mid);
+  border-radius: 2px;
+  background: rgba(108,192,48,0.08);
   color: var(--text-muted);
   padding: 0;
   -moz-appearance: textfield;
@@ -1430,75 +1436,133 @@ body.dark .match-row.is-winner .player-name {
 .tb-input::-webkit-outer-spin-button,
 .tb-input::-webkit-inner-spin-button { -webkit-appearance: none; }
 
+.tb-spacer {
+  display: inline-block;
+  width: 24px;
+  height: 14px;
+}
+
 .winner-select-row {
-  padding: 5px 8px;
+  padding: 4px 6px;
   border-top: 1px solid var(--border);
   background: rgba(0,0,0,0.03);
 }
 
 .winner-select-input {
-  font-size: 11px;
-  padding: 4px 8px;
+  font-size: 10px;
+  padding: 3px 6px;
   height: auto;
+  width: 100%;
 }
 
-/* Score column headers above bracket */
-.bracket-score-header {
+/* =============================================
+   BRACKET — Round Labels Bar
+   ============================================= */
+
+#bracket-round-labels {
   display: flex;
-  justify-content: flex-end;
-  gap: 3px;
-  padding-right: 10px;
-  margin-bottom: 4px;
+  gap: 0;
+  margin-bottom: 10px;
+  padding: 0 4px;
 }
 
-.bracket-score-header span {
-  width: 28px;
-  text-align: center;
+.brl-item {
   font-size: 10px;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.4px;
+  letter-spacing: 0.5px;
   color: var(--text-muted);
-}
-
-/* Wider bracket container for new match cards */
-.bracket-scroll {
-  min-width: 1000px;
-}
-
-/* Winner box */
-.bracket-winner-box {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  height: 100%;
-  flex-shrink: 0;
-  min-width: 160px;
-  padding: 20px;
   text-align: center;
 }
 
-.winner-trophy { font-size: 36px; margin-bottom: 10px; }
+.brl-item.r1, .brl-item.r2, .brl-item.r3 { flex: 1; }
+.brl-item.conn { width: 28px; flex-shrink: 0; }
 
-.winner-label {
-  font-size: 10px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.8px;
-  color: var(--text-muted);
-  margin-bottom: 8px;
+/* =============================================
+   BRACKET — Compact (32-player)
+   ============================================= */
+
+.bracket-compact {
+  gap: 0;
 }
 
-.winner-name {
-  font-size: 14px;
-  font-weight: 800;
-  color: var(--accent-dark);
-  line-height: 1.3;
-  background: var(--accent-light);
-  border: 1.5px solid var(--accent-mid);
-  border-radius: 8px;
-  padding: 10px 14px;
+.bracket-compact .b-match {
+  border-radius: 7px;
+}
+
+.bracket-compact .match-row {
+  padding: 4px 6px;
+  min-height: 20px;
+  gap: 4px;
+}
+
+.bracket-compact .player-name {
+  font-size: 10px;
+}
+
+.bracket-compact .score-grid {
+  grid-template-columns: repeat(3, 18px);
+  gap: 1px;
+}
+
+.bracket-compact .score-cell {
+  font-size: 10px;
+}
+
+.bracket-compact .player-seed {
+  font-size: 8px;
+  padding: 1px 3px;
+}
+
+.bracket-compact .winner-badge {
+  font-size: 7px;
+  padding: 1px 3px;
+}
+
+.bracket-compact .winner-badge-placeholder {
+  width: 16px;
+}
+
+/* =============================================
+   BRACKET — Connector SVG overlay
+   ============================================= */
+
+.bracket-conn-svg {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+/* =============================================
+   BRACKET — Print / PDF
+   ============================================= */
+
+@media print {
+  .bracket-flex {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+  }
+
+  .bracket-round {
+    min-width: 0;
+    flex: 1;
+  }
+
+  .bracket-compact .match-row {
+    padding: 3px 5px;
+    min-height: 18px;
+  }
+
+  .bracket-compact .player-name {
+    font-size: 9pt;
+  }
+
+  .bracket-compact .score-cell {
+    font-size: 8pt;
+  }
 }
 
 /* =============================================
@@ -1663,34 +1727,8 @@ body.dark .match-row.is-winner .player-name {
 .pdf-bracket {
   display: flex;
   align-items: stretch;
-  height: 500px;
   gap: 0;
-}
-
-.pdf-bracket .bracket-round {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-around;
-  height: 100%;
-  flex-shrink: 0;
-  width: 180px;
-}
-
-.pdf-bracket .bracket-connector {
-  flex-shrink: 0;
-  position: relative;
-  height: 100%;
-  width: 50px;
-}
-
-.pdf-bracket .bracket-connector svg {
-  position: absolute;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-}
-
-.pdf-bracket .bracket-winner-box {
-  min-width: 140px;
+  overflow: auto;
 }
 
 .pdf-bracket .b-match {
@@ -1707,12 +1745,7 @@ body.dark .match-row.is-winner .player-name {
 }
 
 .pdf-page-landscape .pdf-bracket {
-  height: 560px;
   flex: 1;
-}
-
-.pdf-page-landscape .pdf-bracket .bracket-round {
-  width: 210px;
 }
 
 /* Public info pages */
