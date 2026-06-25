@@ -166,7 +166,7 @@ const archicup2026Tournament = {
     {
       id: 103,
       name: 'DEBLE MĘŻCZYŹNI 55+',
-      players: 0,
+      players: 3,
       type: 'Każdy z każdym',
       status: 'finished',
       categoryType: 'debel',
@@ -178,7 +178,21 @@ const archicup2026Tournament = {
       dateStart: '2026-06-12',
       timeStart: '12:00',
       participants: [],
-      bracket: null
+      bracket: null,
+      groups: {
+        totalMatches: 3,
+        playedMatches: 3,
+        standings: [
+          { rank: 1, name: 'B. Hunger / R. Lamorski', played: 2, sets: 4, games: 13, points: 6 },
+          { rank: 2, name: 'A. Bartnik / A. Wolny', played: 2, sets: 0, games: 3, points: 4 },
+          { rank: 3, name: 'P. Fischer / B. Brzózka', played: 2, sets: -4, games: -16, points: 2 },
+        ],
+        matches: [
+          { id: 'dm55-g1', playerA: 'B. Hunger / R. Lamorski', playerB: 'P. Fischer / B. Brzózka', score: '6:2 6:3', winner: 'playerA' },
+          { id: 'dm55-g2', playerA: 'B. Hunger / R. Lamorski', playerB: 'A. Bartnik / A. Wolny', score: '7:6 6:1', winner: 'playerA' },
+          { id: 'dm55-g3', playerA: 'A. Bartnik / A. Wolny', playerB: 'P. Fischer / B. Brzózka', score: '6:1 6:2', winner: 'playerA' },
+        ]
+      }
     },
     {
       id: 104,
@@ -430,7 +444,7 @@ const archicup2026Tournament = {
     {
       id: 115,
       name: 'SINGLE KOBIETY 45+ - TURNIEJ POCIESZENIA',
-      players: 0,
+      players: 3,
       type: 'Każdy z każdym',
       status: 'finished',
       categoryType: 'singiel',
@@ -442,7 +456,21 @@ const archicup2026Tournament = {
       dateStart: '2026-06-08',
       timeStart: '12:00',
       participants: [],
-      bracket: null
+      bracket: null,
+      groups: {
+        totalMatches: 3,
+        playedMatches: 3,
+        standings: [
+          { rank: 1, name: 'J. Małecka', played: 2, sets: 2, games: 7, points: 6 },
+          { rank: 2, name: 'P. Paczkowska', played: 2, sets: 0, games: 2, points: 4 },
+          { rank: 3, name: 'O. Knapik', played: 2, sets: -2, games: -9, points: 2 },
+        ],
+        matches: [
+          { id: 'sk45p-g1', playerA: 'J. Małecka', playerB: 'P. Paczkowska', score: '6:2', winner: 'playerA' },
+          { id: 'sk45p-g2', playerA: 'P. Paczkowska', playerB: 'O. Knapik', score: '6:0', winner: 'playerA' },
+          { id: 'sk45p-g3', playerA: 'J. Małecka', playerB: 'O. Knapik', score: '6:3', winner: 'playerA' },
+        ]
+      }
     }
   ]
 };
@@ -1333,6 +1361,70 @@ function buildBracketHTML(bData, compact, adminMode, isBlank) {
   return `<div class="bracket-flex${compact ? ' bracket-compact' : ''}">${renderRounds()}</div>${thirdHtml}${resultsHtml}`;
 }
 
+function buildRoundRobinHTML(cat) {
+  const g = cat.groups;
+  if (!g) return '<div class="empty-state"><div class="empty-icon">📊</div><div class="empty-title">Brak danych grupowych</div></div>';
+
+  const progress = g.totalMatches > 0 ? Math.round((g.playedMatches / g.totalMatches) * 100) : 0;
+  const isDoubles = cat.categoryType === 'debel' || cat.categoryType === 'mikst';
+  const teamLabel = isDoubles ? 'Para' : 'Zawodnik';
+
+  const standingsRows = g.standings.map(s => {
+    const rankClass = `rr-rank-${s.rank}`;
+    const setsStr  = s.sets  > 0 ? `+${s.sets}`  : String(s.sets);
+    const gamesStr = s.games > 0 ? `+${s.games}` : String(s.games);
+    return `
+      <tr class="${rankClass}">
+        <td><span class="rr-rank-badge">${s.rank}</span></td>
+        <td class="rr-name-cell">${s.name}</td>
+        <td>${s.played}</td>
+        <td>${setsStr}</td>
+        <td>${gamesStr}</td>
+        <td><strong>${s.points}</strong></td>
+      </tr>`;
+  }).join('');
+
+  const matchRows = g.matches.map(m => {
+    const aWon = m.winner === 'playerA';
+    return `
+      <div class="rr-match-row">
+        <span class="rr-match-team${aWon ? ' rr-winner' : ''}">${m.playerA}</span>
+        <span class="rr-match-score">${m.score}</span>
+        <span class="rr-match-team${!aWon ? ' rr-winner' : ''} rr-right">${m.playerB}</span>
+      </div>`;
+  }).join('');
+
+  const standingsSection = `
+    <div class="rr-section-title">Aktualna klasyfikacja</div>
+    <div class="rr-table-wrap">
+      <table class="rr-standings-table">
+        <thead>
+          <tr>
+            <th>Rank</th>
+            <th>${teamLabel}</th>
+            <th title="Rozegrane mecze">M</th>
+            <th title="Bilans setów">S</th>
+            <th title="Bilans gemów">G</th>
+            <th title="Punkty">Pkt</th>
+          </tr>
+        </thead>
+        <tbody>${standingsRows}</tbody>
+      </table>
+    </div>`;
+
+  const matchesSection = `
+    <div class="rr-section-title">Mecze w kategorii</div>
+    <div class="rr-match-list">${matchRows}</div>`;
+
+  const metaHtml = `
+    <div class="rr-meta">
+      <span>Rozegrano: <strong>${g.playedMatches}</strong> / <strong>${g.totalMatches}</strong> meczów</span>
+      <span>Postęp: <strong>${progress}%</strong></span>
+    </div>`;
+
+  return metaHtml + standingsSection + matchesSection;
+}
+
 // Znajdź mecz po ID we wszystkich drabinkach
 function findMatchById(matchId) {
   const seen = new Set();
@@ -1689,16 +1781,24 @@ function renderCategoryMainContent(t, cat) {
       });
     }
   } else if (cat.status === 'finished') {
-    container.innerHTML = `
-      <div class="form-panel">
-        <div class="form-panel-title">Drabinka (zakończona)</div>
-        ${cat.bracket ? buildBracketHTML(cat.bracket, false, false, false) : '<div class="empty-state"><div class="empty-icon">🏆</div><div class="empty-title">Brak danych drabinki</div></div>'}
-      </div>`;
-    if (cat.bracket) {
-      requestAnimationFrame(() => {
-        const scroll = container.querySelector('.bracket-flex');
-        if (scroll) initBracketConnectors(scroll.parentElement);
-      });
+    if (cat.format === 'roundrobin') {
+      container.innerHTML = `
+        <div class="form-panel">
+          <div class="form-panel-title">Tabela grupowa (zakończona)</div>
+          ${buildRoundRobinHTML(cat)}
+        </div>`;
+    } else {
+      container.innerHTML = `
+        <div class="form-panel">
+          <div class="form-panel-title">Drabinka (zakończona)</div>
+          ${cat.bracket ? buildBracketHTML(cat.bracket, false, false, false) : '<div class="empty-state"><div class="empty-icon">🏆</div><div class="empty-title">Brak danych drabinki</div></div>'}
+        </div>`;
+      if (cat.bracket) {
+        requestAnimationFrame(() => {
+          const scroll = container.querySelector('.bracket-flex');
+          if (scroll) initBracketConnectors(scroll.parentElement);
+        });
+      }
     }
   }
 }

@@ -2372,3 +2372,131 @@ body.dark .badge-drawn { color: #60A5FA; }
   margin-bottom: 16px;
 }
 
+
+/* =============================================
+   ROUND-ROBIN / GROUP STAGE VIEW
+   ============================================= */
+
+.rr-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 14px;
+  background: var(--surface-alt);
+  border-radius: 8px;
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 20px;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.rr-meta strong { color: var(--text); }
+
+.rr-section-title {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin: 20px 0 10px;
+}
+
+.rr-table-wrap { overflow-x: auto; }
+
+.rr-standings-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.rr-standings-table th {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  padding: 6px 10px;
+  border-bottom: 2px solid var(--border);
+  white-space: nowrap;
+}
+
+.rr-standings-table th:not(:nth-child(2)) { text-align: center; }
+
+.rr-standings-table td {
+  padding: 10px 10px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+
+.rr-standings-table td:not(:nth-child(2)) { text-align: center; }
+.rr-standings-table tr:last-child td { border-bottom: none; }
+
+.rr-standings-table tr.rr-rank-1 td {
+  background: rgba(242, 106, 33, 0.06);
+}
+
+.rr-name-cell { font-weight: 500; }
+.rr-rank-1 .rr-name-cell { font-weight: 700; }
+
+.rr-rank-badge {
+  display: inline-flex;
+  width: 26px;
+  height: 26px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.rr-rank-1 .rr-rank-badge {
+  background: var(--accent);
+  color: #fff;
+}
+
+.rr-rank-2 .rr-rank-badge,
+.rr-rank-3 .rr-rank-badge {
+  background: var(--surface-alt);
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+}
+
+.rr-match-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.rr-match-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 14px;
+  background: var(--surface-alt);
+  border-radius: 8px;
+  font-size: 13px;
+}
+
+.rr-match-team {
+  flex: 1;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.rr-match-team.rr-winner {
+  font-weight: 600;
+  color: var(--text);
+}
+
+.rr-right { text-align: right; }
+
+.rr-match-score {
+  font-weight: 700;
+  font-size: 14px;
+  white-space: nowrap;
+  min-width: 70px;
+  text-align: center;
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+}
