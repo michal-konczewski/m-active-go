@@ -1312,14 +1312,11 @@ function buildBracketHTML(bData, compact, adminMode, isBlank) {
     return buildMatchCardHTML(match, !!adminMode, !!isBlank);
   };
 
-  const rounds = bData.r1
-    ? (bData.r2
-      ? (bData.qf
-        ? [bData.r1, bData.r2, bData.qf, bData.sf, [bData.final]]
-        : [bData.r1, bData.r2, bData.sf, [bData.final]])
-      : [bData.r1, bData.sf, [bData.final]])
-    : [[bData.final]];
-  const filteredRounds = rounds.filter(Boolean);
+  // Auto-detect rounds from available bracket fields in canonical order
+  const filteredRounds = [
+    bData.r1, bData.r2, bData.qf, bData.sf,
+    bData.final ? [bData.final] : null
+  ].filter(Boolean);
 
   const allRoundNames = ['Finał', 'Półfinał', 'Ćwierćfinał', '1/8 finału', '1 runda'];
   const roundNames = allRoundNames.slice(0, filteredRounds.length).reverse();
@@ -1833,16 +1830,24 @@ function renderCategoryMainContent(t, cat) {
       });
     }
   } else if (cat.status === 'active') {
-    container.innerHTML = `
-      <div class="form-panel">
-        <div class="form-panel-title">Drabinka (tryb admin — edycja wyników)</div>
-        ${cat.bracket ? buildBracketHTML(cat.bracket, false, true, false) : '<div class="empty-state"><div class="empty-icon">🔜</div><div class="empty-title">Brak drabinki</div></div>'}
-      </div>`;
-    if (cat.bracket) {
-      requestAnimationFrame(() => {
-        const scroll = container.querySelector('.bracket-flex');
-        if (scroll) initBracketConnectors(scroll.parentElement);
-      });
+    if (cat.format === 'roundrobin') {
+      container.innerHTML = `
+        <div class="form-panel">
+          <div class="form-panel-title">Tabela grupowa (aktywna)</div>
+          ${buildRoundRobinHTML(cat)}
+        </div>`;
+    } else {
+      container.innerHTML = `
+        <div class="form-panel">
+          <div class="form-panel-title">Drabinka (tryb admin — edycja wyników)</div>
+          ${cat.bracket ? buildBracketHTML(cat.bracket, false, true, false) : '<div class="empty-state"><div class="empty-icon">🔜</div><div class="empty-title">Brak drabinki</div></div>'}
+        </div>`;
+      if (cat.bracket) {
+        requestAnimationFrame(() => {
+          const scroll = container.querySelector('.bracket-flex');
+          if (scroll) initBracketConnectors(scroll.parentElement);
+        });
+      }
     }
   } else if (cat.status === 'finished') {
     if (cat.format === 'roundrobin') {
@@ -2118,19 +2123,17 @@ function openDrawModal(tournamentId, categoryId) {
   const seeded = participants.filter(p => p.seed !== null);
   const required = getRequiredSeeds(n);
 
-  if (seeded.length !== required) {
-    showToast(`Przypisz dokładnie ${required} rozstawienia (teraz: ${seeded.length}) — wymagane przed losowaniem`);
-    return;
-  }
-
   document.getElementById('modal-draw-info').innerHTML = `
     <strong>${cat.name}</strong><br>
-    Uczestników: <strong>${n}</strong><br>
-    Rozmiar drabinki: <strong>${S}</strong><br>
-    Bye: <strong>${byes}</strong><br>
-    Rozstawionych: <strong>${seeded.length} / ${required}</strong><br>
+    Uczestników: <strong>${n}</strong> &nbsp;·&nbsp; Drabinka: <strong>${S}</strong> &nbsp;·&nbsp; BYE: <strong>${byes}</strong><br>
+    Rozstawionych: <strong>${seeded.length} / ${required}</strong>
+    ${seeded.length !== required ? `&nbsp;<span style="color:#e53e3e">— wymagane ${required} przy losowaniu drabinki</span>` : ''}<br>
     ${cat.hasThirdPlace ? '<span style="color:var(--text-muted)">🥉 Mecz o 3. miejsce: TAK</span><br>' : ''}
-    ${cat.bracket ? '<span style="color:var(--accent)">⚠️ Uwaga: drabinka zostanie nadpisana!</span>' : ''}`;
+    ${cat.bracket || cat.groups ? '<span style="color:var(--accent)">⚠️ Uwaga: poprzednie losowanie zostanie nadpisane!</span>' : ''}`;
+
+  // Pre-select mode based on current format
+  const modeEl = document.querySelector(`input[name="draw-mode"][value="${cat.format === 'roundrobin' ? 'roundrobin' : 'random'}"]`);
+  if (modeEl) modeEl.checked = true;
 
   state._pendingDraw = { tournamentId, categoryId };
   openModal('modal-draw');
@@ -2158,95 +2161,91 @@ function executeDraw() {
   const cat = t.categories.find(c => c.id === categoryId);
   if (!cat) return;
 
+  const mode = document.querySelector('input[name="draw-mode"]:checked')?.value || 'random';
   const participants = cat.participants || [];
   const n = participants.length;
+
+  // --- MODE: ROUND ROBIN ---
+  if (mode === 'roundrobin') {
+    cat.format = 'roundrobin';
+    cat.type = 'Każdy z każdym';
+    cat.bracket = null;
+    cat.groups = buildRoundRobinGroups(participants);
+    cat.status = 'active';
+    showToast('Format grupowy wygenerowany!');
+    showCategoryDetail(tournamentId, categoryId, true);
+    return;
+  }
+
+  // --- MODE: RANDOM or SEQUENTIAL (elimination bracket) ---
+  const required = getRequiredSeeds(n);
+  const seededCount = participants.filter(p => p.seed !== null).length;
+  if (seededCount !== required) {
+    showToast(`Przypisz dokładnie ${required} rozstawienia (teraz: ${seededCount})`);
+    return;
+  }
+
   const S = nextPow2(Math.max(n, 2));
-  const slots = new Array(S).fill(null);
+  const slots = buildBracketSlots(participants, S, mode === 'random');
 
-  // Place seeds
-  const seeded = participants.filter(p => p.seed !== null).sort((a, b) => a.seed - b.seed);
-  const seedPositions = getSeedPositions(S);
-  seeded.forEach((p, i) => {
-    if (i < seedPositions.length) slots[seedPositions[i]] = p;
-  });
-
-  // Shuffle non-seeded
-  const nonSeeded = participants.filter(p => p.seed === null);
-  shuffle(nonSeeded);
-
-  // Fill remaining slots with non-seeded, then BYEs
-  const emptySlots = slots.map((s, i) => s === null ? i : -1).filter(i => i >= 0);
-  nonSeeded.forEach((p, i) => { if (i < emptySlots.length) slots[emptySlots[i]] = p; });
-
-  // Build first-round matches
+  // Build first-round matches from slots
+  const tbdMatch = (id, round) => mkMatch(id, round, 'TBD', null, 'TBD', null, null,null, null,null, null,null, null,null,null, null);
   const totalMatches = S / 2;
   const r1Matches = [];
-  let matchCounter = 1;
 
   for (let i = 0; i < totalMatches; i++) {
     const pA = slots[i * 2];
     const pB = slots[i * 2 + 1];
-    const aName = pA ? (pA.name2 ? `${pA.name1} / ${pA.name2}` : pA.name1) : 'BYE';
-    const bName = pB ? (pB.name2 ? `${pB.name1} / ${pB.name2}` : pB.name1) : 'BYE';
-    const aSeed = pA ? pA.seed : null;
-    const bSeed = pB ? pB.seed : null;
+    const isBye = (p) => p === 'BYE' || p === null;
+    const getName = (p) => isBye(p) ? 'BYE' : (p.name2 ? `${p.name1} / ${p.name2}` : p.name1);
+    const getSeed = (p) => (isBye(p) ? null : p.seed);
 
-    let winner = null;
-    let status = 'pending';
-    if (!pA || !pB) {
-      winner = !pA ? 'playerB' : 'playerA';
-      status = 'finished';
-    }
+    const aIsBye = isBye(pA), bIsBye = isBye(pB);
+    const winner = (aIsBye && !bIsBye) ? 'playerB' : (!aIsBye && bIsBye) ? 'playerA' : null;
 
-    const match = {
-      id: `draw-r1-${matchCounter++}`,
+    r1Matches.push({
+      id: `draw-r1-${i + 1}`,
       round: 'Runda 1',
-      status,
-      playerA: { name: aName, seed: aSeed },
-      playerB: { name: bName, seed: bSeed },
+      status: winner ? 'finished' : 'pending',
+      playerA: { name: getName(pA), seed: getSeed(pA) },
+      playerB: { name: getName(pB), seed: getSeed(pB) },
       score: [
         { playerAGames: null, playerBGames: null, tieBreakSmallPoints: null },
         { playerAGames: null, playerBGames: null, tieBreakSmallPoints: null },
         { playerAGames: null, playerBGames: null, tieBreakSmallPoints: null },
       ],
       winner
-    };
-    r1Matches.push(match);
+    });
   }
 
   // Build subsequent TBD rounds based on bracket size
-  const tbd = () => ({ name: 'TBD', seed: null });
-  const tbdMatch = (id, round) => mkMatch(id, round, 'TBD', null, 'TBD', null, null,null, null,null, null,null, null,null,null, null);
-
   let bracket;
   if (S === 2) {
-    // 2 players: just a final
     bracket = { final: r1Matches[0] };
   } else if (S === 4) {
-    // 4 players: SF + Final
-    const sf = r1Matches;
-    const final = tbdMatch('draw-f', 'Finał');
-    bracket = { sf, final };
+    bracket = { sf: r1Matches, final: tbdMatch('draw-f', 'Finał') };
   } else if (S === 8) {
-    // 8 players: QF + SF + Final
-    const qf = r1Matches;
-    const sf = [tbdMatch('draw-sf-1','Półfinał'), tbdMatch('draw-sf-2','Półfinał')];
-    const final = tbdMatch('draw-f', 'Finał');
-    bracket = { qf, sf, final };
+    bracket = {
+      qf: r1Matches,
+      sf: [tbdMatch('draw-sf-1','Półfinał'), tbdMatch('draw-sf-2','Półfinał')],
+      final: tbdMatch('draw-f', 'Finał')
+    };
   } else if (S === 16) {
-    // 16 players: R1 + QF + SF + Final
-    const r2 = Array.from({length: 4}, (_, i) => tbdMatch(`draw-qf-${i+1}`, 'Ćwierćfinał'));
-    const sf = [tbdMatch('draw-sf-1','Półfinał'), tbdMatch('draw-sf-2','Półfinał')];
-    const final = tbdMatch('draw-f', 'Finał');
-    bracket = { r1: r1Matches, r2, sf, final };
+    bracket = {
+      r1: r1Matches,
+      r2: Array.from({length: 4}, (_, i) => tbdMatch(`draw-qf-${i+1}`, 'Ćwierćfinał')),
+      sf: [tbdMatch('draw-sf-1','Półfinał'), tbdMatch('draw-sf-2','Półfinał')],
+      final: tbdMatch('draw-f', 'Finał')
+    };
   } else {
-    // 32 or 64: R1 + R2 + QF + SF + Final
     const r2count = totalMatches / 2;
-    const r2 = Array.from({length: r2count}, (_, i) => tbdMatch(`draw-r2-${i+1}`, 'Runda 2'));
-    const qf = Array.from({length: r2count / 2}, (_, i) => tbdMatch(`draw-qf-${i+1}`, 'Ćwierćfinał'));
-    const sf = [tbdMatch('draw-sf-1','Półfinał'), tbdMatch('draw-sf-2','Półfinał')];
-    const final = tbdMatch('draw-f', 'Finał');
-    bracket = { r1: r1Matches, r2, qf, sf, final };
+    bracket = {
+      r1: r1Matches,
+      r2: Array.from({length: r2count}, (_, i) => tbdMatch(`draw-r2-${i+1}`, 'Runda 2')),
+      qf: Array.from({length: r2count / 2}, (_, i) => tbdMatch(`draw-qf-${i+1}`, 'Ćwierćfinał')),
+      sf: [tbdMatch('draw-sf-1','Półfinał'), tbdMatch('draw-sf-2','Półfinał')],
+      final: tbdMatch('draw-f', 'Finał')
+    };
   }
 
   if (cat.hasThirdPlace) {
@@ -2254,10 +2253,83 @@ function executeDraw() {
   }
 
   cat.bracket = bracket;
+  cat.format = 'elimination';
   cat.status = 'drawn';
 
-  showToast('Drabinka wylosowana!');
+  showToast(mode === 'sequential' ? 'Drabinka ułożona w kolejności zapisu!' : 'Drabinka wylosowana!');
   showCategoryDetail(tournamentId, categoryId, true);
+}
+
+function buildBracketSlots(participants, S, randomize) {
+  const slots = new Array(S).fill(null);
+  const numByes = S - participants.length;
+
+  // 1. Place seeds at their canonical positions
+  const seeded = participants.filter(p => p.seed !== null).sort((a, b) => a.seed - b.seed);
+  const seedPositions = getSeedPositions(S);
+  seeded.forEach((p, i) => { if (i < seedPositions.length) slots[seedPositions[i]] = p; });
+
+  // 2. Assign BYEs: seed partner slots first, then hierarchical spread
+  if (numByes > 0) {
+    let byesLeft = numByes;
+
+    // Priority: partner slot of each seed gets a BYE
+    for (const sp of seedPositions) {
+      if (byesLeft <= 0) break;
+      const partner = sp % 2 === 0 ? sp + 1 : sp - 1;
+      if (slots[partner] === null) { slots[partner] = 'BYE'; byesLeft--; }
+    }
+
+    // Remaining BYEs: spread evenly via quantile positions in remaining empty slots
+    if (byesLeft > 0) {
+      const empty = slots.map((s, i) => s === null ? i : -1).filter(i => i >= 0);
+      for (let k = 1; k <= byesLeft && k <= empty.length; k++) {
+        const idx = Math.floor(empty.length * k / (byesLeft + 1));
+        slots[empty[idx]] = 'BYE';
+      }
+    }
+  }
+
+  // 3. Fill remaining slots with non-seeded players (shuffled or in order)
+  const nonSeeded = participants.filter(p => p.seed === null);
+  if (randomize) shuffle(nonSeeded);
+  let pi = 0;
+  for (let i = 0; i < S; i++) {
+    if (slots[i] === null && pi < nonSeeded.length) slots[i] = nonSeeded[pi++];
+  }
+
+  return slots;
+}
+
+function buildRoundRobinGroups(participants) {
+  const matches = [];
+  const standings = participants.map(p => ({
+    name: p.name2 ? `${p.name1} / ${p.name2}` : p.name1,
+    played: 0, wins: 0, losses: 0,
+    sets: '0:0', games: '0:0', points: 0
+  }));
+
+  let matchId = 1;
+  for (let i = 0; i < participants.length; i++) {
+    for (let j = i + 1; j < participants.length; j++) {
+      const pA = participants[i];
+      const pB = participants[j];
+      matches.push({
+        id: `rr-${matchId++}`,
+        playerA: pA.name2 ? `${pA.name1} / ${pA.name2}` : pA.name1,
+        playerB: pB.name2 ? `${pB.name1} / ${pB.name2}` : pB.name1,
+        score: null,
+        winner: null
+      });
+    }
+  }
+
+  return {
+    totalMatches: matches.length,
+    playedMatches: 0,
+    standings: standings.map((s, i) => ({ rank: i + 1, ...s })),
+    matches
+  };
 }
 
 function getSeedPositions(S) {

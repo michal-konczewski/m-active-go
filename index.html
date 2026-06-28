@@ -121,12 +121,29 @@
 
 <!-- Modal: Draw -->
 <div id="modal-draw" class="modal-overlay hidden">
-  <div class="modal-box">
+  <div class="modal-box" style="max-width:520px">
     <div style="font-size:36px;margin-bottom:12px">🎲</div>
     <h2>Losowanie drabinki</h2>
     <div id="modal-draw-info" style="margin-bottom:16px;font-size:14px;color:var(--text-muted);line-height:1.7"></div>
+    <div style="margin-bottom:20px">
+      <div class="form-label" style="margin-bottom:10px">Tryb rozgrywek</div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-size:14px;padding:10px 12px;border:1px solid var(--border);border-radius:8px">
+          <input type="radio" name="draw-mode" value="random" checked style="margin-top:2px;flex-shrink:0"/>
+          <span><strong>🎲 Losuj drabinkę</strong><br><span style="color:var(--text-muted);font-size:12px">Klasyczne losowanie — rozstawieni na właściwych pozycjach, pozostali losowo. BYE rozdzielone hierarchicznie.</span></span>
+        </label>
+        <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-size:14px;padding:10px 12px;border:1px solid var(--border);border-radius:8px">
+          <input type="radio" name="draw-mode" value="sequential" style="margin-top:2px;flex-shrink:0"/>
+          <span><strong>📋 Drabinka bez losowania</strong><br><span style="color:var(--text-muted);font-size:12px">Zawodnicy w kolejności zapisu — bez losowania. Używane do wyników historycznych.</span></span>
+        </label>
+        <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-size:14px;padding:10px 12px;border:1px solid var(--border);border-radius:8px">
+          <input type="radio" name="draw-mode" value="roundrobin" style="margin-top:2px;flex-shrink:0"/>
+          <span><strong>🔄 Każdy z każdym</strong><br><span style="color:var(--text-muted);font-size:12px">Format grupowy — każdy gra z każdym. Generuje tabelę wyników zamiast drabinki.</span></span>
+        </label>
+      </div>
+    </div>
     <div class="modal-actions">
-      <button class="btn btn-primary draw-btn" onclick="executeDraw()">🎲 Losuj drabinkę</button>
+      <button class="btn btn-primary draw-btn" onclick="executeDraw()">Zatwierdź i losuj</button>
       <button class="btn btn-secondary" onclick="closeModal('modal-draw')">Anuluj</button>
     </div>
   </div>
