@@ -1273,7 +1273,7 @@ function buildMatchCardHTML(match, isAdmin, isBlank) {
   const rowA = `
     <div class="match-row ${aWins ? 'is-winner' : ''}">
       <div class="player-info">
-        ${match.playerA.seed ? `<span class="player-seed">${match.playerA.seed}</span>` : ''}
+        ${match.playerA.seed ? `<span class="player-seed">(${match.playerA.seed})</span>` : ''}
         <span class="player-name">${match.playerA.name}</span>
       </div>
       <div class="score-grid">${renderScoreCells(true)}</div>
@@ -1282,7 +1282,7 @@ function buildMatchCardHTML(match, isAdmin, isBlank) {
   const rowB = `
     <div class="match-row ${bWins ? 'is-winner' : ''}">
       <div class="player-info">
-        ${match.playerB.seed ? `<span class="player-seed">${match.playerB.seed}</span>` : ''}
+        ${match.playerB.seed ? `<span class="player-seed">(${match.playerB.seed})</span>` : ''}
         <span class="player-name">${match.playerB.name}</span>
       </div>
       <div class="score-grid">${renderScoreCells(false)}</div>
@@ -1629,6 +1629,7 @@ function openAddCategoryModal() {
   document.getElementById('nc-gender').value = 'kobiety';
   document.getElementById('nc-level').value = 'open';
   document.getElementById('nc-format').value = 'elimination';
+  document.getElementById('nc-third-place').checked = false;
   onCategoryTypeChange();
   openModal('modal-add-category');
 }
@@ -1647,6 +1648,7 @@ function openEditCategoryModal(tournamentId, categoryId) {
   document.getElementById('nc-format').value = cat.format || 'elimination';
   document.getElementById('nc-date').value = cat.dateStart || '';
   document.getElementById('nc-time').value = cat.timeStart || '';
+  document.getElementById('nc-third-place').checked = !!cat.hasThirdPlace;
   onCategoryTypeChange();
   openModal('modal-add-category');
 }
@@ -1683,6 +1685,7 @@ function saveNewCategory() {
   const gender = type === 'mikst' ? 'open' : document.getElementById('nc-gender').value;
   const level = document.getElementById('nc-level').value;
   const format = document.getElementById('nc-format').value;
+  const hasThirdPlace = document.getElementById('nc-third-place').checked;
   const autoName = buildCategoryName(type, gender, level, customName);
   const typeName = format === 'elimination' ? 'Drabinka' : 'Każdy z każdym';
 
@@ -1695,6 +1698,7 @@ function saveNewCategory() {
     cat.level = level;
     cat.format = format;
     cat.type = typeName;
+    cat.hasThirdPlace = hasThirdPlace;
     cat.dateStart = document.getElementById('nc-date').value || null;
     cat.timeStart = document.getElementById('nc-time').value || null;
     closeModal('modal-add-category');
@@ -1716,6 +1720,7 @@ function saveNewCategory() {
     limit: null,
     format,
     seedsCount: 0,
+    hasThirdPlace,
     dateStart: document.getElementById('nc-date').value || null,
     timeStart: document.getElementById('nc-time').value || null,
     bracket: null,
@@ -1771,8 +1776,7 @@ function showCategoryDetail(tournamentId, categoryId, skipHistory) {
       <div><div class="form-label">Płeć</div><div>${genderLabels[cat.gender] || cat.gender || '—'}</div></div>
       <div><div class="form-label">Poziom</div><div>${levelLabels[cat.level] || cat.level || '—'}</div></div>
       <div><div class="form-label">Format</div><div>${formatLabels[cat.format] || cat.type || '—'}</div></div>
-      <div><div class="form-label">Limit</div><div>${cat.limit || 8}</div></div>
-      <div><div class="form-label">Rozstawieni</div><div>${cat.seedsCount || 0}</div></div>
+      <div><div class="form-label">Mecz o 3. miejsce</div><div>${cat.hasThirdPlace ? 'Tak' : 'Nie'}</div></div>
       <div><div class="form-label">Status</div><div>${badgeHtml(cat.status)}</div></div>
     </div>`;
 
@@ -1880,8 +1884,8 @@ function startCategory(tournamentId, categoryId) {
 function renderParticipantsSection(t, cat) {
   const participants = cat.participants || [];
   const isDoubles = cat.categoryType === 'debel' || cat.categoryType === 'mikst';
-  const limit = cat.limit || 8;
-  const maxSeeds = Math.floor(limit / 4);
+  const requiredSeeds = participants.length >= 2 ? getRequiredSeeds(participants.length) : 2;
+  const maxSeeds = requiredSeeds;
 
   const tableHeaders = isDoubles
     ? `<th>Lp.</th><th>Para (Zawodnik 1 / Zawodnik 2)</th><th>Rozstawiony</th><th>Akcje</th>`
@@ -1923,7 +1927,7 @@ function renderParticipantsSection(t, cat) {
 
   return `
     <div class="form-panel">
-      <div class="form-panel-title">Uczestnicy (${participants.length})</div>
+      <div class="form-panel-title">Uczestnicy (${participants.length}) — wymagane ${requiredSeeds} rozstawienia</div>
       <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
         <button class="btn btn-secondary btn-sm" onclick="toggleAddParticipantForm(${cat.id})">➕ Dodaj uczestnika${isDoubles ? '/parę' : ''}</button>
       </div>
@@ -1999,7 +2003,7 @@ function updateParticipantSeed(tournamentId, categoryId, participantId, val) {
   const p = (cat.participants || []).find(p => p.id === participantId);
   if (!p) return;
   const num = parseInt(val);
-  const maxSeeds = Math.floor((cat.limit || 8) / 4);
+  const maxSeeds = getRequiredSeeds((cat.participants || []).length);
   if (isNaN(num) || num < 1 || num > maxSeeds) { showToast('Nieprawidłowy numer rozstawienia'); return; }
   const duplicate = (cat.participants || []).find(other => other.id !== participantId && other.seed === num);
   if (duplicate) { showToast('Numer rozstawienia już jest zajęty'); return; }
@@ -2107,16 +2111,25 @@ function openDrawModal(tournamentId, categoryId) {
 
   const participants = cat.participants || [];
   const n = participants.length;
-  const S = nextPow2(Math.max(n, 2));
+  if (n < 2) { showToast('Dodaj co najmniej 2 uczestników przed losowaniem'); return; }
+
+  const S = nextPow2(n);
   const byes = S - n;
-  const seeds = participants.filter(p => p.seed !== null).length;
+  const seeded = participants.filter(p => p.seed !== null);
+  const required = getRequiredSeeds(n);
+
+  if (seeded.length !== required) {
+    showToast(`Przypisz dokładnie ${required} rozstawienia (teraz: ${seeded.length}) — wymagane przed losowaniem`);
+    return;
+  }
 
   document.getElementById('modal-draw-info').innerHTML = `
     <strong>${cat.name}</strong><br>
     Uczestników: <strong>${n}</strong><br>
     Rozmiar drabinki: <strong>${S}</strong><br>
     Bye: <strong>${byes}</strong><br>
-    Rozstawionych: <strong>${seeds}</strong><br>
+    Rozstawionych: <strong>${seeded.length} / ${required}</strong><br>
+    ${cat.hasThirdPlace ? '<span style="color:var(--text-muted)">🥉 Mecz o 3. miejsce: TAK</span><br>' : ''}
     ${cat.bracket ? '<span style="color:var(--accent)">⚠️ Uwaga: drabinka zostanie nadpisana!</span>' : ''}`;
 
   state._pendingDraw = { tournamentId, categoryId };
@@ -2126,7 +2139,13 @@ function openDrawModal(tournamentId, categoryId) {
 function nextPow2(n) {
   let s = 1;
   while (s < n) s *= 2;
-  return Math.min(s, 32);
+  return Math.min(s, 64);
+}
+
+function getRequiredSeeds(playerCount) {
+  const S = nextPow2(Math.max(playerCount, 2));
+  if (S <= 8) return 2;
+  return S / 4;
 }
 
 function executeDraw() {
@@ -2195,15 +2214,44 @@ function executeDraw() {
     r1Matches.push(match);
   }
 
-  // Build subsequent TBD rounds
+  // Build subsequent TBD rounds based on bracket size
+  const tbd = () => ({ name: 'TBD', seed: null });
+  const tbdMatch = (id, round) => mkMatch(id, round, 'TBD', null, 'TBD', null, null,null, null,null, null,null, null,null,null, null);
+
   let bracket;
-  const numSf = totalMatches / 2;
-  const sfMatches = [];
-  for (let i = 0; i < numSf; i++) {
-    sfMatches.push(mkMatch(`draw-sf-${i+1}`, 'Półfinał', 'TBD', null, 'TBD', null, null,null, null,null, null,null, null,null,null, null));
+  if (S === 2) {
+    // 2 players: just a final
+    bracket = { final: r1Matches[0] };
+  } else if (S === 4) {
+    // 4 players: SF + Final
+    const sf = r1Matches;
+    const final = tbdMatch('draw-f', 'Finał');
+    bracket = { sf, final };
+  } else if (S === 8) {
+    // 8 players: QF + SF + Final
+    const qf = r1Matches;
+    const sf = [tbdMatch('draw-sf-1','Półfinał'), tbdMatch('draw-sf-2','Półfinał')];
+    const final = tbdMatch('draw-f', 'Finał');
+    bracket = { qf, sf, final };
+  } else if (S === 16) {
+    // 16 players: R1 + QF + SF + Final
+    const r2 = Array.from({length: 4}, (_, i) => tbdMatch(`draw-qf-${i+1}`, 'Ćwierćfinał'));
+    const sf = [tbdMatch('draw-sf-1','Półfinał'), tbdMatch('draw-sf-2','Półfinał')];
+    const final = tbdMatch('draw-f', 'Finał');
+    bracket = { r1: r1Matches, r2, sf, final };
+  } else {
+    // 32 or 64: R1 + R2 + QF + SF + Final
+    const r2count = totalMatches / 2;
+    const r2 = Array.from({length: r2count}, (_, i) => tbdMatch(`draw-r2-${i+1}`, 'Runda 2'));
+    const qf = Array.from({length: r2count / 2}, (_, i) => tbdMatch(`draw-qf-${i+1}`, 'Ćwierćfinał'));
+    const sf = [tbdMatch('draw-sf-1','Półfinał'), tbdMatch('draw-sf-2','Półfinał')];
+    const final = tbdMatch('draw-f', 'Finał');
+    bracket = { r1: r1Matches, r2, qf, sf, final };
   }
-  const final = mkMatch(`draw-f`, 'Finał', 'TBD', null, 'TBD', null, null,null, null,null, null,null, null,null,null, null);
-  bracket = { r1: r1Matches, sf: sfMatches, final };
+
+  if (cat.hasThirdPlace) {
+    bracket.third = tbdMatch('draw-third', 'Mecz o 3. miejsce');
+  }
 
   cat.bracket = bracket;
   cat.status = 'drawn';
