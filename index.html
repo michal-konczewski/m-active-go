@@ -49,72 +49,48 @@
   </div>
 </div>
 
-<!-- Modal: Add Category -->
+<!-- Modal: Add / Edit Category -->
 <div id="modal-add-category" class="modal-overlay hidden">
   <div class="modal-box" style="max-width:560px">
-    <h2>Dodaj kategorię</h2>
+    <h2 id="nc-modal-title">Dodaj kategorię</h2>
+    <input type="hidden" id="nc-edit-id" value=""/>
     <div class="form-grid" style="margin-bottom:16px">
-      <div class="form-group full">
-        <label class="form-label">Nazwa kategorii</label>
-        <input class="form-input" id="nc-name" placeholder="np. Singiel kobiety open"/>
-      </div>
       <div class="form-group">
         <label class="form-label">Typ</label>
-        <select class="form-input" id="nc-type">
+        <select class="form-input" id="nc-type" onchange="onCategoryTypeChange()">
           <option value="singiel">Singiel</option>
           <option value="debel">Debel</option>
           <option value="mikst">Mikst</option>
         </select>
       </div>
-      <div class="form-group">
-        <label class="form-label">Płeć / Grupa</label>
+      <div class="form-group" id="nc-gender-group">
+        <label class="form-label">Płeć</label>
         <select class="form-input" id="nc-gender">
           <option value="kobiety">Kobiety</option>
           <option value="mezczyzni">Mężczyźni</option>
-          <option value="open">Open</option>
         </select>
       </div>
       <div class="form-group">
-        <label class="form-label">Poziom</label>
+        <label class="form-label">Poziom wiekowy</label>
         <select class="form-input" id="nc-level">
           <option value="open">Open</option>
-          <option value="poczatkujacy">Początkujący</option>
-          <option value="sredniozaawansowany">Średniozaawansowany</option>
-          <option value="zaawansowany">Zaawansowany</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Limit uczestników</label>
-        <select class="form-input" id="nc-limit">
-          <option value="8">8</option>
-          <option value="16">16</option>
-          <option value="32">32</option>
+          <option value="30+">30+</option>
+          <option value="35+">35+</option>
+          <option value="40+">40+</option>
+          <option value="45+">45+</option>
+          <option value="50+">50+</option>
+          <option value="55+">55+</option>
+          <option value="60+">60+</option>
+          <option value="65+">65+</option>
+          <option value="70+">70+</option>
+          <option value="75+">75+</option>
         </select>
       </div>
       <div class="form-group">
         <label class="form-label">Format rozgrywek</label>
         <select class="form-input" id="nc-format">
           <option value="elimination">Drabinka single-elimination</option>
-          <option value="groups">Grupy + play-off</option>
           <option value="roundrobin">Każdy z każdym</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Liczba rozstawionych</label>
-        <select class="form-input" id="nc-seeds">
-          <option value="0">0</option>
-          <option value="2" selected>2</option>
-          <option value="4">4</option>
-          <option value="8">8</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Status</label>
-        <select class="form-input" id="nc-status">
-          <option value="planned">Planowana</option>
-          <option value="drawn">Rozlosowana</option>
-          <option value="active">Aktywna</option>
-          <option value="finished">Zakończona</option>
         </select>
       </div>
       <div class="form-group">
@@ -124,6 +100,10 @@
       <div class="form-group">
         <label class="form-label">Godzina startu</label>
         <input class="form-input" type="time" id="nc-time"/>
+      </div>
+      <div class="form-group full">
+        <label class="form-label">Nazwa kategorii (opcjonalnie — wypełniana automatycznie)</label>
+        <input class="form-input" id="nc-name" placeholder="np. TURNIEJ POCIESZENIA"/>
       </div>
     </div>
     <div class="modal-actions">
@@ -444,21 +424,6 @@
           </div>
         </div>
 
-        <div class="form-panel">
-          <div class="form-panel-title">Kategorie turniejowe</div>
-          <div id="category-tags" class="categories-list"></div>
-          <div class="add-category-row">
-            <input class="form-input" placeholder="Nazwa kategorii, np. Singiel mężczyźni open" id="new-category-input"
-              style="flex:1" onkeydown="if(event.key==='Enter'){addCategory()}"/>
-            <button class="btn btn-secondary" onclick="addCategory()">+ Dodaj kategorię</button>
-          </div>
-          <div style="margin-top:12px">
-            <button class="btn btn-ghost btn-sm" onclick="addDefaultCategories()" style="font-size:12px">
-              ✨ Dodaj domyślne kategorie
-            </button>
-          </div>
-        </div>
-
         <div style="display:flex;gap:10px;align-items:center">
           <button class="btn btn-primary" onclick="saveTournament()">💾 Zapisz turniej</button>
           <button class="btn btn-ghost" onclick="resetTournamentForm()">Wyczyść formularz</button>
@@ -509,15 +474,6 @@
                 <option value="finished">Zakończony</option>
               </select>
             </div>
-          </div>
-        </div>
-        <div class="form-panel">
-          <div class="form-panel-title">Kategorie</div>
-          <div id="edit-category-tags" class="categories-list"></div>
-          <div class="add-category-row">
-            <input class="form-input" placeholder="Dodaj kategorię…" id="edit-new-category-input"
-              style="flex:1" onkeydown="if(event.key==='Enter'){addEditCategory()}"/>
-            <button class="btn btn-secondary" onclick="addEditCategory()">+ Dodaj</button>
           </div>
         </div>
         <div style="display:flex;gap:10px">

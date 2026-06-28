@@ -1606,38 +1606,116 @@ function renderTournamentDetailCategories(tournamentId) {
         ${c.participants && c.participants.length > 0 ? `<span>✓ ${c.participants.length} zapisanych</span>` : ''}
       </div>
       <div class="cat-card-actions" onclick="event.stopPropagation()">
-        <button class="btn btn-primary btn-sm" onclick="showCategoryDetail(${tournamentId}, ${c.id})">Otwórz kategorię →</button>
+        <button class="btn btn-primary btn-sm" onclick="showCategoryDetail(${tournamentId}, ${c.id})">Otwórz →</button>
+        <button class="btn btn-ghost btn-sm" onclick="openEditCategoryModal(${tournamentId}, ${c.id})">✏️ Edytuj</button>
+        <button class="btn btn-ghost btn-sm" style="color:#e53e3e" onclick="deleteCategory(${tournamentId}, ${c.id})">🗑 Usuń</button>
         ${pdfBtn}
       </div>
     </div>`;
   }).join('');
 }
 
+function onCategoryTypeChange() {
+  const type = document.getElementById('nc-type').value;
+  const genderGroup = document.getElementById('nc-gender-group');
+  genderGroup.style.display = type === 'mikst' ? 'none' : '';
+}
+
 function openAddCategoryModal() {
+  document.getElementById('nc-modal-title').textContent = 'Dodaj kategorię';
+  document.getElementById('nc-edit-id').value = '';
+  ['nc-name','nc-date','nc-time'].forEach(id => { document.getElementById(id).value = ''; });
+  document.getElementById('nc-type').value = 'singiel';
+  document.getElementById('nc-gender').value = 'kobiety';
+  document.getElementById('nc-level').value = 'open';
+  document.getElementById('nc-format').value = 'elimination';
+  onCategoryTypeChange();
   openModal('modal-add-category');
 }
 
-function saveNewCategory() {
-  const name = document.getElementById('nc-name').value.trim();
-  if (!name) { showToast('Podaj nazwę kategorii'); return; }
+function openEditCategoryModal(tournamentId, categoryId) {
+  const t = state.tournaments.find(t => t.id === tournamentId);
+  const cat = t?.categories.find(c => c.id === categoryId);
+  if (!cat) return;
 
+  document.getElementById('nc-modal-title').textContent = 'Edytuj kategorię';
+  document.getElementById('nc-edit-id').value = categoryId;
+  document.getElementById('nc-name').value = cat.name || '';
+  document.getElementById('nc-type').value = cat.categoryType || 'singiel';
+  document.getElementById('nc-gender').value = cat.gender || 'kobiety';
+  document.getElementById('nc-level').value = cat.level || 'open';
+  document.getElementById('nc-format').value = cat.format || 'elimination';
+  document.getElementById('nc-date').value = cat.dateStart || '';
+  document.getElementById('nc-time').value = cat.timeStart || '';
+  onCategoryTypeChange();
+  openModal('modal-add-category');
+}
+
+function deleteCategory(tournamentId, categoryId) {
+  const t = state.tournaments.find(t => t.id === tournamentId);
+  if (!t) return;
+  const cat = t.categories.find(c => c.id === categoryId);
+  if (!cat) return;
+  if (!confirm(`Usunąć kategorię "${cat.name}"?`)) return;
+  t.categories = t.categories.filter(c => c.id !== categoryId);
+  showToast(`Kategoria "${cat.name}" została usunięta.`);
+  renderTournamentDetailCategories(tournamentId);
+}
+
+function buildCategoryName(type, gender, level, customSuffix) {
+  const typeLabel = { singiel: 'SINGLE', debel: 'DEBLE', mikst: 'MIKSTY' }[type] || type.toUpperCase();
+  const genderLabel = { kobiety: 'KOBIETY', mezczyzni: 'MĘŻCZYŹNI' }[gender] || '';
+  const levelLabel = level === 'open' ? 'OPEN' : level;
+  const parts = type === 'mikst'
+    ? [typeLabel, levelLabel]
+    : [typeLabel, genderLabel, levelLabel];
+  const base = parts.filter(Boolean).join(' ');
+  return customSuffix ? `${base} - ${customSuffix.toUpperCase()}` : base;
+}
+
+function saveNewCategory() {
   const t = state.tournaments.find(t => t.id === state.selectedTournamentId);
   if (!t) return;
+
+  const editId = document.getElementById('nc-edit-id').value;
+  const customName = document.getElementById('nc-name').value.trim();
+  const type = document.getElementById('nc-type').value;
+  const gender = type === 'mikst' ? 'open' : document.getElementById('nc-gender').value;
+  const level = document.getElementById('nc-level').value;
+  const format = document.getElementById('nc-format').value;
+  const autoName = buildCategoryName(type, gender, level, customName);
+  const typeName = format === 'elimination' ? 'Drabinka' : 'Każdy z każdym';
+
+  if (editId) {
+    const cat = t.categories.find(c => c.id === parseInt(editId));
+    if (!cat) return;
+    cat.name = autoName;
+    cat.categoryType = type;
+    cat.gender = gender;
+    cat.level = level;
+    cat.format = format;
+    cat.type = typeName;
+    cat.dateStart = document.getElementById('nc-date').value || null;
+    cat.timeStart = document.getElementById('nc-time').value || null;
+    closeModal('modal-add-category');
+    showToast(`Kategoria "${autoName}" została zaktualizowana.`);
+    renderTournamentDetailCategories(state.selectedTournamentId);
+    return;
+  }
 
   const maxId = Math.max(0, ...state.tournaments.flatMap(t => t.categories.map(c => c.id)));
   const newCat = {
     id: maxId + 1,
-    name,
-    players: parseInt(document.getElementById('nc-limit').value) || 8,
-    type: document.getElementById('nc-format').value === 'elimination' ? 'Drabinka' :
-          document.getElementById('nc-format').value === 'roundrobin' ? 'Każdy z każdym' : 'Grupy + play-off',
-    status: document.getElementById('nc-status').value || 'planned',
-    categoryType: document.getElementById('nc-type').value,
-    gender: document.getElementById('nc-gender').value,
-    level: document.getElementById('nc-level').value,
-    limit: parseInt(document.getElementById('nc-limit').value) || 8,
-    format: document.getElementById('nc-format').value,
-    seedsCount: parseInt(document.getElementById('nc-seeds').value) || 2,
+    name: autoName,
+    players: 0,
+    type: typeName,
+    status: 'planned',
+    categoryType: type,
+    gender,
+    level,
+    limit: null,
+    format,
+    seedsCount: 0,
     dateStart: document.getElementById('nc-date').value || null,
     timeStart: document.getElementById('nc-time').value || null,
     bracket: null,
@@ -1646,11 +1724,8 @@ function saveNewCategory() {
 
   t.categories.push(newCat);
   closeModal('modal-add-category');
-  showToast(`Kategoria "${name}" została dodana.`);
+  showToast(`Kategoria "${autoName}" została dodana.`);
   renderTournamentDetailCategories(state.selectedTournamentId);
-
-  // Reset form
-  ['nc-name','nc-date','nc-time'].forEach(id => { document.getElementById(id).value = ''; });
 }
 
 /* =============================================
@@ -1809,8 +1884,8 @@ function renderParticipantsSection(t, cat) {
   const maxSeeds = Math.floor(limit / 4);
 
   const tableHeaders = isDoubles
-    ? `<th>Lp.</th><th>Para (Zawodnik 1 / Zawodnik 2)</th><th>Klub/Miasto</th><th>Ranking</th><th>Rozstawiony</th><th>Akcje</th>`
-    : `<th>Lp.</th><th>Zawodnik</th><th>Klub/Miasto</th><th>Ranking</th><th>Rozstawiony</th><th>Akcje</th>`;
+    ? `<th>Lp.</th><th>Para (Zawodnik 1 / Zawodnik 2)</th><th>Rozstawiony</th><th>Akcje</th>`
+    : `<th>Lp.</th><th>Zawodnik</th><th>Rozstawiony</th><th>Akcje</th>`;
 
   const tableRows = participants.map((p, i) => {
     const seedInput = p.seed !== null ? `<input type="number" class="form-input" style="width:60px;display:inline-block;padding:4px 6px" min="1" max="${maxSeeds}" value="${p.seed}" onchange="updateParticipantSeed(${t.id}, ${cat.id}, '${p.id}', this.value)"/>` : '';
@@ -1818,8 +1893,6 @@ function renderParticipantsSection(t, cat) {
       <tr>
         <td>${i + 1}</td>
         <td>${isDoubles ? `<strong>${p.name1}</strong> / ${p.name2 || '<em style="color:var(--text-muted)">brak</em>'}` : `<strong>${p.name1}</strong>`}</td>
-        <td>${p.club || '—'}</td>
-        <td>${p.ranking || '—'}</td>
         <td>
           <label style="display:flex;align-items:center;gap:6px;cursor:pointer">
             <input type="checkbox" ${p.seed !== null ? 'checked' : ''} onchange="toggleParticipantSeed(${t.id}, ${cat.id}, '${p.id}', this.checked)"/>
@@ -1835,31 +1908,24 @@ function renderParticipantsSection(t, cat) {
 
   const addFormHtml = isDoubles ? `
     <div id="add-participant-form-${cat.id}" class="participant-add-form hidden">
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr auto;gap:8px;align-items:end">
+      <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:8px;align-items:end">
         <div><label class="form-label">Zawodnik 1</label><input class="form-input" id="np-name1-${cat.id}" placeholder="Imię Nazwisko"/></div>
         <div><label class="form-label">Zawodnik 2</label><input class="form-input" id="np-name2-${cat.id}" placeholder="Imię Nazwisko"/></div>
-        <div><label class="form-label">Klub</label><input class="form-input" id="np-club-${cat.id}" placeholder="Klub/Miasto"/></div>
-        <div><label class="form-label">Ranking</label><input class="form-input" id="np-ranking-${cat.id}" placeholder="np. 450"/></div>
         <button class="btn btn-primary" onclick="addParticipant(${t.id}, ${cat.id})">Dodaj</button>
       </div>
     </div>` : `
     <div id="add-participant-form-${cat.id}" class="participant-add-form hidden">
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:8px;align-items:end">
+      <div style="display:grid;grid-template-columns:1fr auto;gap:8px;align-items:end">
         <div><label class="form-label">Imię i nazwisko</label><input class="form-input" id="np-name1-${cat.id}" placeholder="Imię Nazwisko"/></div>
-        <div><label class="form-label">Klub</label><input class="form-input" id="np-club-${cat.id}" placeholder="Klub/Miasto"/></div>
-        <div><label class="form-label">Ranking</label><input class="form-input" id="np-ranking-${cat.id}" placeholder="np. 450"/></div>
         <button class="btn btn-primary" onclick="addParticipant(${t.id}, ${cat.id})">Dodaj</button>
       </div>
     </div>`;
 
   return `
     <div class="form-panel">
-      <div class="form-panel-title">
-        Uczestnicy — Drabinka ${limit} ${isDoubles ? 'par' : 'zawodników'} — maksymalnie ${maxSeeds} rozstawień
-      </div>
+      <div class="form-panel-title">Uczestnicy (${participants.length})</div>
       <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
         <button class="btn btn-secondary btn-sm" onclick="toggleAddParticipantForm(${cat.id})">➕ Dodaj uczestnika${isDoubles ? '/parę' : ''}</button>
-        <button class="btn btn-ghost btn-sm" onclick="addMockParticipants(${t.id}, ${cat.id})">🎾 Dodaj przykładowe ${isDoubles ? 'pary' : 'zawodników'}</button>
       </div>
       ${addFormHtml}
       ${participants.length > 0 ? `
@@ -1868,7 +1934,7 @@ function renderParticipantsSection(t, cat) {
             <thead><tr>${tableHeaders}</tr></thead>
             <tbody>${tableRows}</tbody>
           </table>
-        </div>` : `<div class="empty-state" style="padding:30px"><div class="empty-icon">👥</div><div class="empty-title">Brak uczestników</div><div class="empty-desc">Dodaj uczestników ręcznie lub skorzystaj z przykładowych danych.</div></div>`}
+        </div>` : `<div class="empty-state" style="padding:30px"><div class="empty-icon">👥</div><div class="empty-title">Brak uczestników</div><div class="empty-desc">Dodaj uczestników ręcznie.</div></div>`}
     </div>`;
 }
 
@@ -1886,8 +1952,6 @@ function addParticipant(tournamentId, categoryId) {
   const name1 = document.getElementById(`np-name1-${cat.id}`)?.value.trim();
   const name2El = document.getElementById(`np-name2-${cat.id}`);
   const name2 = name2El ? name2El.value.trim() : null;
-  const club = document.getElementById(`np-club-${cat.id}`)?.value.trim() || '';
-  const ranking = document.getElementById(`np-ranking-${cat.id}`)?.value.trim() || '';
 
   if (!name1) { showToast('Podaj imię i nazwisko'); return; }
 
@@ -1896,8 +1960,6 @@ function addParticipant(tournamentId, categoryId) {
     id: 'p' + Date.now(),
     name1,
     name2: name2 || null,
-    club,
-    ranking,
     seed: null,
     status: 'confirmed'
   });
