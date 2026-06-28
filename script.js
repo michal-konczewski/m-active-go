@@ -1178,12 +1178,7 @@ function _showBracket(tournamentId, categoryId, skipHistory) {
     return;
   }
 
-  labelsArea.innerHTML = `
-    <div class="brl-item r1">Ćwierćfinał</div>
-    <div class="brl-item conn"></div>
-    <div class="brl-item r2">Półfinał</div>
-    <div class="brl-item conn"></div>
-    <div class="brl-item r3">Finał</div>`;
+  labelsArea.innerHTML = '';
 
   bracketArea.innerHTML = buildBracketHTML(cat.bracket, false, false, false);
   requestAnimationFrame(() => initBracketConnectors(bracketArea));
@@ -1278,7 +1273,6 @@ function buildMatchCardHTML(match, isAdmin, isBlank) {
   const rowA = `
     <div class="match-row ${aWins ? 'is-winner' : ''}">
       <div class="player-info">
-        ${aWins ? '<span class="winner-badge">W</span>' : '<span class="winner-badge-placeholder"></span>'}
         ${match.playerA.seed ? `<span class="player-seed">${match.playerA.seed}</span>` : ''}
         <span class="player-name">${match.playerA.name}</span>
       </div>
@@ -1288,7 +1282,6 @@ function buildMatchCardHTML(match, isAdmin, isBlank) {
   const rowB = `
     <div class="match-row ${bWins ? 'is-winner' : ''}">
       <div class="player-info">
-        ${bWins ? '<span class="winner-badge">W</span>' : '<span class="winner-badge-placeholder"></span>'}
         ${match.playerB.seed ? `<span class="player-seed">${match.playerB.seed}</span>` : ''}
         <span class="player-name">${match.playerB.name}</span>
       </div>
@@ -1328,11 +1321,17 @@ function buildBracketHTML(bData, compact, adminMode, isBlank) {
     : [[bData.final]];
   const filteredRounds = rounds.filter(Boolean);
 
+  const allRoundNames = ['Finał', 'Półfinał', 'Ćwierćfinał', '1/8 finału', '1 runda'];
+  const roundNames = allRoundNames.slice(0, filteredRounds.length).reverse();
+
   const renderRounds = () => {
     const parts = [];
     for (let ri = 0; ri < filteredRounds.length; ri++) {
       const rnd = filteredRounds[ri];
-      parts.push(`<div class="bracket-round" data-matches="${rnd.length}">${rnd.map(m => matchCard(m)).join('')}</div>`);
+      parts.push(`<div class="bracket-round" data-matches="${rnd.length}">
+        <div class="bracket-round-name">${roundNames[ri]}</div>
+        ${rnd.map(m => matchCard(m)).join('')}
+      </div>`);
       if (ri < filteredRounds.length - 1) {
         parts.push(`<div class="bracket-conn" data-from="${rnd.length}" data-to="${filteredRounds[ri+1].length}"></div>`);
       }
@@ -1344,21 +1343,7 @@ function buildBracketHTML(bData, compact, adminMode, isBlank) {
     ? `<div class="bracket-third-place"><span class="bracket-third-label">Mecz o 3. miejsce</span>${matchCard(bData.third)}</div>`
     : '';
 
-  const resultsHtml = (() => {
-    const fin = bData.final;
-    if (!fin || !fin.winner) return '';
-    const first = fin.winner === 'playerA' ? fin.playerA.name : fin.playerB.name;
-    const second = fin.winner === 'playerA' ? fin.playerB.name : fin.playerA.name;
-    let rows = `<div class="result-row result-1"><span class="result-place">1.</span><span class="result-name">${first}</span></div>`;
-    rows += `<div class="result-row result-2"><span class="result-place">2.</span><span class="result-name">${second}</span></div>`;
-    if (bData.third && bData.third.winner) {
-      const third = bData.third.winner === 'playerA' ? bData.third.playerA.name : bData.third.playerB.name;
-      rows += `<div class="result-row result-3"><span class="result-place">3.</span><span class="result-name">${third}</span></div>`;
-    }
-    return `<div class="bracket-results">${rows}</div>`;
-  })();
-
-  return `<div class="bracket-flex${compact ? ' bracket-compact' : ''}">${renderRounds()}</div>${thirdHtml}${resultsHtml}`;
+  return `<div class="bracket-scroll-wrap"><div class="bracket-flex${compact ? ' bracket-compact' : ''}">${renderRounds()}</div>${thirdHtml}</div>`;
 }
 
 function buildRoundRobinHTML(cat) {
